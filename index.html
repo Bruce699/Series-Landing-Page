@@ -1,0 +1,2862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Series</title>
+  <style>
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('SF Pro/SFProDisplay-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('SF Pro/SFProDisplay-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('SF Pro/SFProDisplay-Semibold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #F3F3F3;
+      overflow: hidden;
+    }
+
+    #rive-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      height: 100%;
+    }
+
+    #rive-canvas {
+      display: block;
+    }
+
+    #bottom-gradient {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 289px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+      pointer-events: none;
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    /* ---- button_style shared base ---- */
+    .button_style {
+      position: fixed;
+      left: 50%;
+      bottom: -60px;
+      transform: translateX(-50%) translateY(50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #202020;
+      border: none;
+      cursor: pointer;
+      opacity: 0;
+      will-change: transform, opacity, bottom;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      z-index: 2;
+    }
+
+    /* Return to Series button */
+    #return-to-series {
+      width: calc(100vw - 40px);
+      padding: 16px 14px;
+      gap: 10px;
+      border-radius: 8px;
+    }
+
+    #return-to-series span {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20.989px;
+      color: #FFF;
+      font-feature-settings: 'liga' off, 'clig' off;
+    }
+
+    #return-to-series .return-icon {
+      height: calc(20 / 13 * 1.1 * 1.1 * 1em);
+      width: auto;
+      vertical-align: middle;
+    }
+
+    /* CTA button specifics */
+    #cta-button {
+      width: calc(100vw - 40px);
+      padding: 16px 14px;
+      gap: 10px;
+      border-radius: 8px;
+    }
+
+    #cta-button span {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 20.989px;
+      color: #FFF;
+      font-feature-settings: 'liga' off, 'clig' off;
+    }
+
+    /* Next Step button specifics */
+    #next-step-button {
+      left: auto;
+      right: 20px;
+      transform: translateY(50%);
+      width: 55px;
+      height: 55px;
+      padding: 0;
+      border-radius: 10px;
+    }
+
+    #next-step-button img {
+      width: 55px;
+      height: 55px;
+      display: block;
+    }
+
+    /* Name card next button - same style as next-step-button */
+    #name-card-next {
+      left: auto;
+      right: 20px;
+      transform: translateY(50%);
+      width: 55px;
+      height: 55px;
+      padding: 0;
+      border-radius: 10px;
+    }
+
+    #name-card-next img {
+      width: 55px;
+      height: 55px;
+      display: block;
+    }
+
+    /* Go back button - mirrored, bottom-left */
+    #go-back-btn {
+      left: 20px;
+      right: auto;
+      transform: translateY(50%);
+      width: 55px;
+      height: 55px;
+      padding: 0;
+      border-radius: 10px;
+    }
+
+    #go-back-btn img {
+      width: 55px;
+      height: 55px;
+      display: block;
+      transform: scaleX(-1);
+    }
+
+    /* ---- Shared card style ---- */
+    .card {
+      position: fixed;
+      width: calc(256 / 393 * 100vw * 1.155);
+      aspect-ratio: 690 / 920;
+      border-radius: 25.6px;
+      overflow: hidden;
+      opacity: 0;
+      z-index: 3;
+      will-change: transform, opacity;
+    }
+
+    .card .card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .card .card-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 32px 29px 50px 29px;
+      gap: 47px;
+    }
+
+    .card .card-title {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 28px;
+      font-weight: 500;
+      font-style: normal;
+      line-height: 110%;
+      color: #FFF;
+      letter-spacing: -0.186px;
+      font-feature-settings: 'liga' off, 'clig' off;
+      white-space: nowrap;
+    }
+
+    #pronouns-card .card-title,
+    #ethnicity-card .card-title,
+    #religion-card .card-title {
+      white-space: normal;
+    }
+
+
+    .card .card-fields {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      align-self: stretch;
+      gap: 0;
+    }
+
+    .card .card-field {
+      display: flex;
+      flex-direction: column;
+      align-self: stretch;
+      padding-top: 20px;
+      gap: 10px;
+    }
+
+    .card .card-field:first-child {
+      padding-top: 0;
+    }
+
+    .card .card-field input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 100%;
+      letter-spacing: -0.138px;
+      color: #A2A2A2;
+      font-feature-settings: 'liga' off, 'clig' off;
+      padding: 0 5px;
+      width: 100%;
+    }
+
+    .card .card-field input::placeholder {
+      color: #A2A2A2;
+    }
+
+    .date-field-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+    }
+
+    .date-field-wrapper .date-placeholder {
+      position: absolute;
+      top: 0;
+      left: 5px;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 100%;
+      color: #A2A2A2;
+      pointer-events: none;
+    }
+
+    .date-field-wrapper input[type="date"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: transparent;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 100%;
+      letter-spacing: -0.138px;
+      padding: 0 5px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .date-field-wrapper.has-value .date-placeholder {
+      display: none;
+    }
+
+    .date-field-wrapper.has-value input[type="date"] {
+      color: #A2A2A2;
+    }
+
+    .date-field-wrapper input[type="date"]::-webkit-date-and-time-value {
+      text-align: left;
+    }
+
+    .date-field-wrapper input[type="date"]::-webkit-inner-spin-button {
+      display: none;
+    }
+
+    .date-field-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: transparent;
+      cursor: pointer;
+    }
+
+    /* ---- Radio option rows ---- */
+    .card .card-option-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-self: stretch;
+      padding-top: 20px;
+      gap: 10px;
+    }
+
+    .card .card-option-wrapper:first-child {
+      padding-top: 0;
+    }
+
+    .card .card-option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card .card-option-row .option-label {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 100%;
+      letter-spacing: -0.138px;
+      color: #A2A2A2;
+      padding: 0 5px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card .option-radio {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2.5px solid #A2A2A2;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s ease;
+    }
+
+    .card .option-radio .radio-fill {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FFF;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .card .card-option-wrapper.selected .option-radio {
+      border-color: #FFF;
+    }
+
+    .card .card-option-wrapper.selected .option-radio .radio-fill {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .card .option-line {
+      width: 100%;
+      height: 1px;
+      background: #A2A2A2;
+      opacity: 0.4;
+    }
+
+    .card .card-field .field-line {
+      width: 100%;
+      height: 1px;
+      background: #A2A2A2;
+      opacity: 0.4;
+    }
+
+    /* ---- Card subtitle ---- */
+    .card .card-subtitle {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 130%;
+      color: #A2A2A2;
+      opacity: 0.6;
+      margin-top: -35px;
+    }
+
+    /* ---- Location dropdown (frosted glass) ---- */
+    .location-dropdown {
+      display: none;
+      flex-direction: column;
+      position: fixed;
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      background: rgba(40, 40, 40, 0.7);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .location-dropdown::-webkit-scrollbar {
+      display: none;
+    }
+
+    .location-dropdown.visible {
+      display: flex;
+    }
+
+    .location-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .location-item:last-child {
+      border-bottom: none;
+    }
+
+    .location-item span {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 120%;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .location-item:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ---- Square checkbox style (multi-select) ---- */
+    .card .option-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      border: 2.5px solid #A2A2A2;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s ease;
+    }
+
+    .card .option-checkbox .checkbox-fill {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: #FFF;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .card .card-option-wrapper.selected .option-checkbox {
+      border-color: #FFF;
+    }
+
+    .card .card-option-wrapper.selected .option-checkbox .checkbox-fill {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ---- Scrollable fields with mask fade ---- */
+    .card .card-fields-scroll-wrapper {
+      position: relative;
+      align-self: stretch;
+      overflow: hidden;
+    }
+
+    .card .card-fields-scroll {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%);
+      mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%);
+    }
+
+    .card .card-fields-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ---- Social fields ---- */
+    .social-field {
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 12px !important;
+      flex-wrap: wrap;
+    }
+
+    .social-field .social-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .social-field .social-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .social-field input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .social-field .field-line {
+      width: 100%;
+    }
+
+    /* Social confirm dialog */
+    .social-confirm-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .social-confirm-overlay.visible {
+      opacity: 1;
+    }
+
+    .social-confirm-sheet {
+      width: calc(100% - 16px);
+      background: rgba(44, 44, 46, 0.95);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .social-confirm-overlay.visible .social-confirm-sheet {
+      transform: translateY(0);
+    }
+
+    .social-confirm-title {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      padding: 16px 16px 8px;
+    }
+
+    .social-confirm-message {
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      padding: 0 16px 16px;
+    }
+
+    .social-confirm-btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      background: transparent;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: #0A84FF;
+      text-align: center;
+      cursor: pointer;
+      border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .social-confirm-btn.cancel {
+      font-weight: 600;
+    }
+
+    .social-confirm-cancel {
+      width: calc(100% - 16px);
+      background: rgba(44, 44, 46, 0.95);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
+      border-radius: 14px;
+      margin-bottom: 8px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .social-confirm-overlay.visible .social-confirm-cancel {
+      transform: translateY(0);
+    }
+
+    .social-confirm-cancel .social-confirm-btn {
+      border-top: none;
+      font-weight: 600;
+    }
+
+    #skip-socials {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50%);
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #A2A2A2;
+      z-index: 2;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #skip-socials.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #skip-interests {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50%);
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #A2A2A2;
+      z-index: 2;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #skip-interests.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ---- Interests card ---- */
+    .interests-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 40px;
+      border: 1.5px solid #A2A2A2;
+      border-radius: 12px;
+      padding: 0 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .interests-search-bar .search-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .interests-search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: #FFFFFF;
+      min-width: 0;
+    }
+
+    .interests-search-bar input::placeholder {
+      color: #A2A2A2;
+      opacity: 0.6;
+    }
+
+    .interests-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      width: 100%;
+    }
+
+    .interest-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1.5px solid #A2A2A2;
+      border-radius: 20px;
+      font-family: 'SF Pro Display', -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: #A2A2A2;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .interest-tag.selected {
+      border-color: #FFFFFF;
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .interest-tag .tag-remove {
+      display: none;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .interest-tag.selected .tag-remove {
+      display: inline;
+    }
+
+    #interests-card .card-content {
+      gap: 12px;
+      overflow: hidden;
+      justify-content: flex-end;
+      padding-bottom: 28px;
+    }
+
+    #interests-card .card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    #interests-card .card-subtitle {
+      margin-top: 0;
+    }
+
+    .interests-tags-scroll {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      max-height: 130px;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black 100%);
+    }
+
+    .interests-tags-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ---- Photo card ---- */
+    #photo-card .card-content {
+      justify-content: flex-end;
+      padding-bottom: 28px;
+      gap: 6px;
+    }
+
+    #photo-card .card-subtitle {
+      margin-top: 0;
+    }
+
+    .photo-upload-area {
+      width: calc(368 / 690 * 100%);
+      aspect-ratio: 1 / 1;
+      align-self: center;
+      position: absolute;
+      top: calc(394 / 920 * 100%);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .photo-upload-icon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+
+    .photo-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+
+    /* ---- Welcome card ---- */
+    #welcome-card {
+      overflow: hidden;
+    }
+
+    .welcome-photo-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
+    }
+
+    .welcome-blur-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 35%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Progressive blur via stacked backdrop-filter layers */
+    .welcome-blur-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .welcome-blur-layer:nth-child(1) {
+      height: 100%;
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(2) {
+      height: 75%;
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(3) {
+      height: 50%;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(4) {
+      height: 30%;
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    /* Dark gradient overlay for text readability */
+    .welcome-dark-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45%;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(69,69,69,0) 0%, rgba(69,69,69,1) 100%);
+      border-radius: 0 0 25.6px 25.6px;
+    }
+
+    #welcome-card .card-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      justify-content: flex-end;
+      padding-bottom: 60px;
+      z-index: 3;
+    }
+
+    #welcome-card .card-title {
+      white-space: normal;
+      font-size: 32px;
+    }
+
+    #welcome-card .card-content {
+      padding-bottom: 25.2px;
+    }
+
+    #socials-card .card-content {
+      gap: 12px;
+      padding-bottom: 30px;
+    }
+
+    #socials-card .card-subtitle {
+      margin-top: 0;
+    }
+
+    #socials-card .socials-fields {
+      gap: 0;
+    }
+
+    #socials-card .social-field {
+      padding-top: 10px !important;
+      gap: 8px !important;
+    }
+    /* ---- Progress Ring ---- */
+    #progress-ring {
+      position: fixed;
+      left: calc(342 / 396 * 100vw - 18px);
+      top: calc(64 / 852 * 100vh - 18px);
+      width: 36px;
+      height: 36px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #progress-ring svg {
+      width: 36px;
+      height: 36px;
+      transform: rotate(-90deg);
+    }
+
+    #progress-ring .ring-bg {
+      fill: none;
+      stroke: #CECECE;
+      stroke-width: 2.4;
+    }
+
+    #progress-ring .ring-fg {
+      fill: none;
+      stroke: #202020;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s cubic-bezier(0.5, 0, 0, 1);
+    }
+  </style>
+</head>
+<body>
+  <div id="rive-wrapper">
+    <canvas id="rive-canvas"></canvas>
+  </div>
+
+  <!-- Progress Ring: 11 steps -->
+  <div id="progress-ring">
+    <svg viewBox="0 0 24 24">
+      <circle class="ring-bg" cx="12" cy="12" r="9.6"/>
+      <circle class="ring-fg" cx="12" cy="12" r="9.6" stroke-dasharray="60.319" stroke-dashoffset="60.319"/>
+    </svg>
+  </div>
+
+  <div id="bottom-gradient"></div>
+
+  <button id="cta-button" class="button_style">
+    <span>Create your profile</span>
+  </button>
+
+  <button id="return-to-series" class="button_style">
+    <img src="iMessage Icon.png" alt="" class="return-icon"><span>Return to Series</span>
+  </button>
+
+  <button id="next-step-button" class="button_style">
+    <img src="Next Step.svg" alt="Next Step">
+  </button>
+
+  <span id="skip-socials">Skip</span>
+  <span id="skip-interests">Skip</span>
+
+  <button id="name-card-next" class="button_style">
+    <img src="Next Step.svg" alt="Next Step">
+  </button>
+
+  <div id="name-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What's your name?</h2>
+      <div class="card-fields">
+        <div class="card-field">
+          <input type="text" placeholder="First name">
+          <div class="field-line"></div>
+        </div>
+        <div class="card-field">
+          <input type="text" placeholder="Last name">
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button id="go-back-btn" class="button_style">
+    <img src="Next Step.svg" alt="Go Back">
+  </button>
+
+  <div id="birthday-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">When's your birthday?</h2>
+      <div class="card-fields">
+        <div class="card-field">
+          <div class="date-field-wrapper">
+            <span class="date-placeholder" id="date-placeholder">Date</span>
+            <input type="date" id="birthday-input">
+          </div>
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pronouns-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What are your pronounces?</h2>
+      <div class="card-fields">
+        <div class="card-option-wrapper" data-name="pronouns">
+          <div class="card-option-row" data-value="she/her">
+            <span class="option-label">She/her</span>
+            <div class="option-radio"><div class="radio-fill"></div></div>
+          </div>
+          <div class="option-line"></div>
+        </div>
+        <div class="card-option-wrapper" data-name="pronouns">
+          <div class="card-option-row" data-value="he/him">
+            <span class="option-label">He/him</span>
+            <div class="option-radio"><div class="radio-fill"></div></div>
+          </div>
+          <div class="option-line"></div>
+        </div>
+        <div class="card-option-wrapper" data-name="pronouns">
+          <div class="card-option-row" data-value="they/them">
+            <span class="option-label">They/them</span>
+            <div class="option-radio"><div class="radio-fill"></div></div>
+          </div>
+          <div class="option-line"></div>
+        </div>
+        <div class="card-option-wrapper" data-name="pronouns">
+          <div class="card-option-row" data-value="other">
+            <span class="option-label">Other</span>
+            <div class="option-radio"><div class="radio-fill"></div></div>
+          </div>
+          <div class="option-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ethnicity-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What's your ethnicity?</h2>
+      <div class="card-fields-scroll-wrapper">
+        <div class="card-fields-scroll" id="ethnicity-scroll">
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="hispanic">
+              <span class="option-label">Hispanic/latino</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="middle-eastern">
+              <span class="option-label">Middle Eastern</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="african">
+              <span class="option-label">African/African Diaspora</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="south-asian">
+              <span class="option-label">South Asian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="southeast-asian">
+              <span class="option-label">Southeast Asian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="east-asian">
+              <span class="option-label">East Asian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="white">
+              <span class="option-label">White/Caucasian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="ethnicity">
+            <div class="card-option-row" data-value="other">
+              <span class="option-label">Other</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sexuality-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What's your sexuality?</h2>
+      <div class="card-fields-scroll-wrapper">
+        <div class="card-fields-scroll" id="sexuality-scroll">
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="straight">
+              <span class="option-label">Straight/Heterosexual</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="gay">
+              <span class="option-label">Gay</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="lesbian">
+              <span class="option-label">Lesbian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="bisexual">
+              <span class="option-label">Bisexual</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="pansexual">
+              <span class="option-label">Pansexual</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="asexual">
+              <span class="option-label">Asexual</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="questioning">
+              <span class="option-label">Questioning</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="sexuality">
+            <div class="card-option-row" data-value="other">
+              <span class="option-label">Other</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="religion-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What is your religious background?</h2>
+      <div class="card-fields-scroll-wrapper">
+        <div class="card-fields-scroll" id="religion-scroll">
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="atheist">
+              <span class="option-label">Atheist</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="christian">
+              <span class="option-label">Christian</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="muslim">
+              <span class="option-label">Muslim</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="jewish">
+              <span class="option-label">Jewish</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="hindu">
+              <span class="option-label">Hindu</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="buddhist">
+              <span class="option-label">Buddhist</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="sikh">
+              <span class="option-label">Sikh</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="spiritual">
+              <span class="option-label">Spiritual</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+          <div class="card-option-wrapper" data-name="religion">
+            <div class="card-option-row" data-value="other">
+              <span class="option-label">Other</span>
+              <div class="option-checkbox"><div class="checkbox-fill"></div></div>
+            </div>
+            <div class="option-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="location-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What's your location?</h2>
+      <p class="card-subtitle">This helps us make better location based matches.</p>
+      <div class="card-fields">
+        <div class="card-field">
+          <input type="text" placeholder="Location" id="location-input" autocomplete="off">
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="location-dropdown" id="location-dropdown"></div>
+
+  <div id="job-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">What's your job title?</h2>
+      <div class="card-fields">
+        <div class="card-field">
+          <input type="text" placeholder="Title" id="job-input">
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="socials-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title">Add in your socials</h2>
+      <p class="card-subtitle">Allow us to pull information from across platforms to give you better matches.</p>
+      <div class="card-fields socials-fields">
+        <div class="card-field social-field" data-social="email">
+          <div class="social-icon"><img src="social icons/Email.svg" alt="Email"></div>
+          <input type="email" placeholder="Email" id="email-input">
+          <div class="field-line"></div>
+        </div>
+        <div class="card-field social-field" data-social="linkedin">
+          <div class="social-icon"><img src="social icons/Linkedin.svg" alt="LinkedIn"></div>
+          <input type="text" placeholder="LinkedIn" id="linkedin-input" readonly>
+          <div class="field-line"></div>
+        </div>
+        <div class="card-field social-field" data-social="instagram">
+          <div class="social-icon"><img src="social icons/instagram.svg" alt="Instagram"></div>
+          <input type="text" placeholder="Instagram" id="instagram-input" readonly>
+          <div class="field-line"></div>
+        </div>
+        <div class="card-field social-field" data-social="x">
+          <div class="social-icon"><img src="social icons/X.svg" alt="X"></div>
+          <input type="text" placeholder="X" id="x-input" readonly>
+          <div class="field-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="interests-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <h2 class="card-title" style="white-space:normal;">Choose interests that represents you!</h2>
+      <p class="card-subtitle">Show others your hobbies and skills</p>
+      <div class="card-fields">
+        <div class="interests-search-bar">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.4351 10.0629H10.7124L10.4563 9.81589C11.3528 8.77301 11.8925 7.4191 11.8925 5.94625C11.8925 2.66209 9.23042 0 5.94625 0C2.66209 0 0 2.66209 0 5.94625C0 9.23042 2.66209 11.8925 5.94625 11.8925C7.4191 11.8925 8.77301 11.3528 9.81589 10.4563L10.0629 10.7124V11.4351L14.6369 16L16 14.6369L11.4351 10.0629ZM5.94625 10.0629C3.66838 10.0629 1.82962 8.22413 1.82962 5.94625C1.82962 3.66838 3.66838 1.82962 5.94625 1.82962C8.22413 1.82962 10.0629 3.66838 10.0629 5.94625C10.0629 8.22413 8.22413 10.0629 5.94625 10.0629Z" fill="#A2A2A2"/>
+          </svg>
+          <input type="text" placeholder="" id="interests-search">
+        </div>
+        <div class="interests-tags-scroll">
+          <div class="interests-tags" id="interests-tags"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="photo-card" class="card">
+    <img class="card-bg" src="Card_Background.png" alt="">
+    <div class="card-content">
+      <div class="photo-upload-area" id="photo-upload-area">
+        <img id="photo-preview" class="photo-preview" style="display:none;">
+        <img src="Photo Upload.svg" id="photo-upload-icon" class="photo-upload-icon" alt="Upload photo">
+      </div>
+      <h2 class="card-title">Add your photo!</h2>
+      <p class="card-subtitle">Profile photo required. A clear photo of you helps you get more matches!</p>
+      <input type="file" accept="image/*" id="photo-file-input" style="display:none;">
+    </div>
+  </div>
+
+  <div id="welcome-card" class="card" style="pointer-events:none;">
+    <div class="welcome-photo-bg" id="welcome-photo-bg"></div>
+    <div class="welcome-blur-overlay">
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+    </div>
+    <div class="welcome-dark-gradient"></div>
+    <img class="card-bg" src="Transparent Card.png" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;">
+    <div class="card-content" style="z-index:3;">
+      <h2 class="card-title" id="welcome-name"></h2>
+    </div>
+  </div>
+
+  <!-- Final animation deck cards -->
+  <div id="final-card-0" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 241.png" alt=""></div>
+  <div id="final-card-1" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 242.png" alt=""></div>
+  <div id="final-card-2" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 244.png" alt=""></div>
+  <div id="final-card-3" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 245.png" alt=""></div>
+  <div id="final-card-4" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 248.png" alt=""></div>
+  <div id="final-card-5" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 249.png" alt=""></div>
+  <div id="final-card-6" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 250.png" alt=""></div>
+  <div id="final-card-7" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 251.png" alt=""></div>
+  <div id="final-card-8" class="card final-deck-card"><img class="card-bg" src="final animation/Frame 252.png" alt=""></div>
+
+  <!-- iOS-style social confirm dialog -->
+  <div class="social-confirm-overlay" id="social-confirm-overlay">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;padding:0 8px;">
+      <div class="social-confirm-sheet">
+        <div class="social-confirm-title" id="social-confirm-title">Open in LinkedIn?</div>
+        <div class="social-confirm-message" id="social-confirm-message">This will redirect you to log in with your account.</div>
+        <button class="social-confirm-btn" id="social-confirm-open">Open</button>
+        <button class="social-confirm-btn" id="social-confirm-manual">Enter Manually</button>
+      </div>
+      <div class="social-confirm-cancel">
+        <button class="social-confirm-btn cancel" id="social-confirm-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://unpkg.com/@rive-app/canvas@2.23.10"></script>
+  <script>
+    (async () => {
+      const canvas = document.getElementById('rive-canvas');
+      const ctaBtn = document.getElementById('cta-button');
+      const nextBtn = document.getElementById('next-step-button');
+      const nameCardNext = document.getElementById('name-card-next');
+      const goBackBtn = document.getElementById('go-back-btn');
+      const returnBtn = document.getElementById('return-to-series');
+      const progressRing = document.getElementById('progress-ring');
+      const progressFg = progressRing.querySelector('.ring-fg');
+      const RING_CIRCUMFERENCE = 60.319;
+      const RING_STEPS = 11;
+
+      function updateProgressRing(step, complete) {
+        // step is 0-indexed (0 = name card, 10 = photo card)
+        const filled = complete ? RING_STEPS : Math.min(step + 1, RING_STEPS - 1);
+        const offset = RING_CIRCUMFERENCE * (1 - filled / RING_STEPS);
+        progressFg.style.strokeDashoffset = offset;
+      }
+      const gradient = document.getElementById('bottom-gradient');
+      const nameCard = document.getElementById('name-card');
+      const birthdayCard = document.getElementById('birthday-card');
+      const pronounsCard = document.getElementById('pronouns-card');
+      const ethnicityCard = document.getElementById('ethnicity-card');
+      const sexualityCard = document.getElementById('sexuality-card');
+      const religionCard = document.getElementById('religion-card');
+      const locationCard = document.getElementById('location-card');
+      const jobCard = document.getElementById('job-card');
+      const socialsCard = document.getElementById('socials-card');
+      const interestsCard = document.getElementById('interests-card');
+      const photoCard = document.getElementById('photo-card');
+      const welcomeCard = document.getElementById('welcome-card');
+      const EASE = 'cubic-bezier(0.5, 0, 0, 1)';
+
+      let num1Input = null;
+
+      /* ---- button_style: reusable animation system ---- */
+      const buttonState = new Map();
+
+      function buttonShow(btn) {
+        buttonState.set(btn, true);
+        btn.animate([
+          { bottom: '-60px', opacity: 0 },
+          { bottom: '40px', opacity: 1 }
+        ], {
+          duration: 400,
+          easing: EASE,
+          fill: 'forwards'
+        });
+      }
+
+      function buttonHide(btn, onComplete) {
+        buttonState.set(btn, false);
+        btn.getAnimations().forEach(a => a.cancel());
+        btn.style.bottom = '40px';
+        btn.style.opacity = '1';
+        btn.style.transform = getBaseTransform(btn) + ' scale(1)';
+
+        const anim = btn.animate([
+          { bottom: '40px', opacity: 1 },
+          { bottom: '-60px', opacity: 0 }
+        ], {
+          duration: 450,
+          easing: EASE,
+          fill: 'forwards'
+        });
+
+        anim.onfinish = () => {
+          btn.style.bottom = '-60px';
+          btn.style.opacity = '0';
+          if (onComplete) onComplete();
+        };
+      }
+
+      function getBaseTransform(btn) {
+        return (btn.id === 'next-step-button' || btn.id === 'name-card-next' || btn.id === 'go-back-btn')
+          ? 'translateY(50%)'
+          : 'translateX(-50%) translateY(50%)';
+      }
+
+      function buttonPressStart(btn, e) {
+        if (!buttonState.get(btn)) return;
+        e.preventDefault();
+        btn.style.transform = getBaseTransform(btn) + ' scale(0.98)';
+        btn.style.transition = 'transform 0.1s ease-out';
+      }
+
+      function buttonPressRestore(btn) {
+        btn.style.transform = getBaseTransform(btn) + ' scale(1)';
+        btn.style.transition = 'transform 0.08s ease-out';
+      }
+
+      function attachButtonStyle(btn, onRelease) {
+        btn.addEventListener('mousedown', (e) => buttonPressStart(btn, e));
+        btn.addEventListener('mouseup', (e) => {
+          if (!buttonState.get(btn)) return;
+          e.preventDefault();
+          buttonPressRestore(btn);
+          onRelease();
+        });
+        btn.addEventListener('mouseleave', () => {
+          if (!buttonState.get(btn)) return;
+          buttonPressRestore(btn);
+        });
+
+        btn.addEventListener('touchstart', (e) => buttonPressStart(btn, e), { passive: false });
+        btn.addEventListener('touchend', (e) => {
+          if (!buttonState.get(btn)) return;
+          e.preventDefault();
+          buttonPressRestore(btn);
+          onRelease();
+        }, { passive: false });
+        btn.addEventListener('touchcancel', () => {
+          if (!buttonState.get(btn)) return;
+          buttonPressRestore(btn);
+        });
+      }
+
+      /* ---- Spatial card arc system ---- */
+      /* Cards live on a circular arc. Each card slot is ARC_ANGLE apart.
+         Adjacent cards always show their corners. All cards rotate together. */
+      const ARC_RADIUS = 586;
+      const ARC_ANGLE = 36;
+      const ARC_DURATION = 640;
+      const ARC_EASE = 'cubic-bezier(0.5, 0, 0, 1)';
+
+      function cardArcSetup(card) {
+        const cardW = card.offsetWidth;
+        const cardH = card.offsetHeight;
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+        const finalLeft = (winW - cardW) / 2;
+        const finalTop = (winH - cardH) / 2;
+        const ox = cardW * 0.5;
+        const oy = cardH * 0.81 + ARC_RADIUS;
+        card.style.left = finalLeft + 'px';
+        card.style.top = finalTop + 'px';
+        card.style.transformOrigin = ox + 'px ' + oy + 'px';
+      }
+
+      /* Snap a card to an angle instantly (no animation) */
+      function cardSnapTo(card, angle) {
+        cardArcSetup(card);
+        card.style.transform = 'rotate(' + angle + 'deg)';
+        card.style.opacity = '1';
+      }
+
+      /* Animate a card from one angle to another */
+      function cardArcAnimate(card, fromAngle, toAngle) {
+        cardArcSetup(card);
+        card.style.opacity = '1';
+        card.style.transform = 'rotate(' + fromAngle + 'deg)';
+        return card.animate([
+          { transform: 'rotate(' + fromAngle + 'deg)' },
+          { transform: 'rotate(' + toAngle + 'deg)' }
+        ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+      }
+
+      /* Position all visible cards based on current index */
+      function layoutCards() {
+        cardFlow.forEach((entry, i) => {
+          const offset = i - currentCardIndex;
+          if (offset >= -1 && offset <= 1) {
+            cardSnapTo(entry.card, offset * ARC_ANGLE);
+          } else {
+            entry.card.style.opacity = '0';
+          }
+        });
+      }
+
+      /* Transition forward: all visible cards rotate left by ARC_ANGLE */
+      function transitionForward() {
+        if (currentCardIndex >= cardFlow.length - 1) return;
+
+        // Animate cards that are currently visible
+        const prev = currentCardIndex - 1;
+        const curr = currentCardIndex;
+        const next = currentCardIndex + 1;
+        const nextNext = currentCardIndex + 2;
+
+        // Previous card (if exists): -ARC_ANGLE → -2*ARC_ANGLE
+        if (prev >= 0) {
+          cardArcAnimate(cardFlow[prev].card, -ARC_ANGLE, -2 * ARC_ANGLE);
+        }
+        // Current card: 0 → -ARC_ANGLE
+        cardArcAnimate(cardFlow[curr].card, 0, -ARC_ANGLE);
+        // Next card: +ARC_ANGLE → 0
+        cardArcAnimate(cardFlow[next].card, ARC_ANGLE, 0);
+        // Next-next card (if exists): snap to +ARC_ANGLE so it peeks in
+        if (nextNext < cardFlow.length) {
+          cardSnapTo(cardFlow[nextNext].card, 2 * ARC_ANGLE);
+          cardArcAnimate(cardFlow[nextNext].card, 2 * ARC_ANGLE, ARC_ANGLE);
+        }
+
+        currentCardIndex++;
+        updateProgressRing(currentCardIndex);
+
+        // After animation, hide cards that are now 2+ away
+        setTimeout(() => {
+          if (prev >= 0) cardFlow[prev].card.style.opacity = '0';
+        }, ARC_DURATION);
+
+        // If we just arrived at the last card (photo), peek the welcome card
+        if (currentCardIndex === cardFlow.length - 1) {
+          // Populate welcome card
+          const preview = document.getElementById('photo-preview');
+          if (preview.src) {
+            welcomePhotoBg.style.backgroundImage = 'url(' + preview.src + ')';
+          }
+          const firstNameInput = nameCard.querySelector('input[placeholder="First name"]');
+          const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+          welcomeName.textContent = 'Welcome, ' + (firstName || 'Friend') + '!';
+
+          cardSnapTo(welcomeCard, 2 * ARC_ANGLE);
+          cardArcAnimate(welcomeCard, 2 * ARC_ANGLE, ARC_ANGLE);
+        }
+      }
+
+      /* Transition backward: all visible cards rotate right by ARC_ANGLE */
+      function transitionBackward() {
+        if (currentCardIndex <= 0) return;
+
+        const prevPrev = currentCardIndex - 2;
+        const prev = currentCardIndex - 1;
+        const curr = currentCardIndex;
+        const next = currentCardIndex + 1;
+
+        // If we're leaving the last card (photo), hide the welcome card peek
+        if (curr === cardFlow.length - 1) {
+          cardArcAnimate(welcomeCard, ARC_ANGLE, 2 * ARC_ANGLE);
+          setTimeout(() => { welcomeCard.style.opacity = '0'; }, ARC_DURATION);
+        }
+
+        // Next card (if exists): +ARC_ANGLE → +2*ARC_ANGLE
+        if (next < cardFlow.length) {
+          cardArcAnimate(cardFlow[next].card, ARC_ANGLE, 2 * ARC_ANGLE);
+        }
+        // Current card: 0 → +ARC_ANGLE
+        cardArcAnimate(cardFlow[curr].card, 0, ARC_ANGLE);
+        // Previous card: -ARC_ANGLE → 0
+        cardArcAnimate(cardFlow[prev].card, -ARC_ANGLE, 0);
+        // Prev-prev card (if exists): snap and animate to -ARC_ANGLE
+        if (prevPrev >= 0) {
+          cardSnapTo(cardFlow[prevPrev].card, -2 * ARC_ANGLE);
+          cardArcAnimate(cardFlow[prevPrev].card, -2 * ARC_ANGLE, -ARC_ANGLE);
+        }
+
+        currentCardIndex--;
+        updateProgressRing(currentCardIndex);
+
+        // After animation, hide cards that are now 2+ away
+        setTimeout(() => {
+          if (next < cardFlow.length) cardFlow[next].card.style.opacity = '0';
+        }, ARC_DURATION);
+      }
+
+      /* ---- Final deck animation ---- */
+      function playFinalAnimation() {
+        const SCALE = 0.64 * 1.1 * 1.2; // 120% bigger = 0.8448
+        const PHASE1_DURATION = 1200;
+        const PHASE2_DURATION = 600;
+        const PHASE1_EASE = ARC_EASE;
+        const PHASE2_EASE = 'cubic-bezier(0.3, 0, 0, 1)';
+        const welcomeAngle = -10;
+
+        // Scale welcome card font
+        const welcomeTitle = welcomeCard.querySelector('.card-title');
+        if (welcomeTitle) welcomeTitle.style.fontSize = (32 * SCALE) + 'px';
+
+        // 1. Hide buttons; complete and fade out progress ring
+        buttonHide(nameCardNext);
+        buttonHide(goBackBtn);
+        updateProgressRing(0, true);
+        setTimeout(() => {
+          progressRing.style.transition = 'opacity 0.4s ease';
+          progressRing.style.opacity = '0';
+        }, 500);
+        const skipS = document.getElementById('skip-socials');
+        const skipI = document.getElementById('skip-interests');
+        if (skipS) skipS.classList.remove('visible');
+        if (skipI) skipI.classList.remove('visible');
+
+        // 2. Rotate photo card out
+        const curr = currentCardIndex;
+        const prevIdx = currentCardIndex - 1;
+        cardArcAnimate(cardFlow[curr].card, 0, -ARC_ANGLE);
+        if (prevIdx >= 0) {
+          cardArcAnimate(cardFlow[prevIdx].card, -ARC_ANGLE, -2 * ARC_ANGLE);
+        }
+
+        // Collect deck cards
+        const finalCards = [];
+        for (let i = 0; i < 9; i++) {
+          finalCards.push(document.getElementById('final-card-' + i));
+        }
+
+        const cardW = welcomeCard.offsetWidth;
+        const cardH = welcomeCard.offsetHeight;
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+
+        // Start position: compute where cards are at ARC_ANGLE on the circular arc
+        const arcOx = cardW * 0.5;
+        const arcOy = cardH * 0.81 + ARC_RADIUS;
+        const arcOrigLeft = (winW - cardW) / 2;
+        const arcOrigTop = (winH - cardH) / 2;
+        const radStart = ARC_ANGLE * Math.PI / 180;
+        const cRelY = cardH / 2 - arcOy;
+        const startCenterX = arcOrigLeft + arcOx + (-cRelY * Math.sin(radStart));
+        const startCenterY = arcOrigTop + arcOy + (cRelY * Math.cos(radStart));
+        const startLeft = startCenterX - cardW / 2;
+        const startTop = startCenterY - cardH / 2;
+
+        // End position (phase 1): centered on screen, scaled, 0° rotation
+        const endLeft = (winW - cardW) / 2;
+        const endTop = (winH - cardH) / 2;
+
+        const allCards = [welcomeCard, ...finalCards];
+
+        // PHASE 1: All cards move together from arc-peek to screen center, scale down, rotate to 0°
+        // All stacked perfectly behind welcome card
+        allCards.forEach((card, i) => {
+          card.getAnimations().forEach(a => a.cancel());
+          card.style.zIndex = (i === 0) ? 20 : (10 - i);
+          card.style.opacity = '1';
+          card.style.willChange = 'transform';
+          card.style.position = 'fixed';
+          card.style.left = '0px';
+          card.style.top = '0px';
+          // Phase 1: center origin for move+scale
+          card.style.transformOrigin = (cardW / 2) + 'px ' + (cardH / 2) + 'px';
+
+          const fromTransform = 'translate(' + startLeft + 'px, ' + startTop + 'px) rotate(' + ARC_ANGLE + 'deg) scale(1)';
+          const midTransform = 'translate(' + endLeft + 'px, ' + endTop + 'px) rotate(0deg) scale(' + SCALE + ')';
+
+          const anim = card.animate([
+            { transform: fromTransform },
+            { transform: midTransform }
+          ], {
+            duration: PHASE1_DURATION,
+            easing: PHASE1_EASE,
+            fill: 'forwards'
+          });
+
+          // PHASE 2: After landing, fan out from bottom pivot (50% x, 85% y)
+          anim.onfinish = () => {
+            anim.commitStyles();
+            anim.cancel();
+
+            const landAngle = (i === 0) ? welcomeAngle : welcomeAngle + i * 2.5;
+            if (landAngle === 0) return; // No rotation needed
+
+            // Switch to bottom pivot for the fan-out
+            // Since card is already scaled and centered, we need to rotate
+            // around 50%, 85% of the VISUAL card (which is scaled)
+            // But transform-origin is in local (unscaled) coords
+            const fanOriginX = cardW * 0.5;
+            const fanOriginY = cardH * 0.85;
+            card.style.transformOrigin = fanOriginX + 'px ' + fanOriginY + 'px';
+
+            // Current state: translate(endLeft, endTop) rotate(0) scale(SCALE)
+            // We need to: keep translate+scale the same, just add rotation around new origin
+            // But changing transform-origin shifts the visual position.
+            // Compensate: the offset between old origin (center) and new origin (50%,85%)
+            const doy = fanOriginY - cardH / 2; // shift in Y (positive = down)
+            // When changing origin, the visual position shifts by (1-scale) * delta
+            const compensateY = -(1 - SCALE) * doy;
+
+            const midCompensated = 'translate(' + endLeft + 'px, ' + (endTop + compensateY) + 'px) rotate(0deg) scale(' + SCALE + ')';
+            const endTransform = 'translate(' + endLeft + 'px, ' + (endTop + compensateY) + 'px) rotate(' + landAngle + 'deg) scale(' + SCALE + ')';
+
+            card.animate([
+              { transform: midCompensated },
+              { transform: endTransform }
+            ], {
+              duration: PHASE2_DURATION,
+              easing: PHASE2_EASE,
+              fill: 'forwards'
+            });
+          };
+        });
+
+        // After photo card exit, hide onboarding cards
+        setTimeout(() => {
+          cardFlow.forEach(entry => { entry.card.style.opacity = '0'; });
+        }, ARC_DURATION);
+
+        // Show "Return to Series" button after full animation
+        // and enable swipe interaction
+        setTimeout(() => {
+          buttonShow(returnBtn);
+          initDeckSwipe(allCards, SCALE, endLeft, endTop, compensateY, cardW, cardH, welcomeAngle);
+        }, PHASE1_DURATION + PHASE2_DURATION);
+
+        // Store compensateY for swipe system — computed from phase 2
+        const doy = cardH * 0.85 - cardH / 2;
+        const compensateY = -(1 - SCALE) * doy;
+      }
+
+      /* ---- Deck swipe interaction ---- */
+      function initDeckSwipe(allCards, SCALE, baseLeft, baseTop, compensateY, cardW, cardH, welcomeAngle) {
+        // Build ordered deck array: index 0 = top (welcome), rest underneath
+        const deck = allCards.map((card, i) => ({
+          el: card,
+          restAngle: (i === 0) ? welcomeAngle : welcomeAngle + i * 2.5,
+          originalIndex: i
+        }));
+
+        let activeIdx = 0;
+        let state = 'idle'; // idle | dragging | snapping | dismissing | settling
+        let startX = 0, startY = 0, dragX = 0, dragY = 0;
+        let lastX = 0, lastTime = 0, velocityX = 0;
+        const SWIPE_THRESHOLD = 80;
+        const VELOCITY_THRESHOLD = 0.5;
+        const MAX_ROTATION = 15; // degrees at full drag
+        const DRAG_ROTATION_FACTOR = 0.08;
+
+        function getRestTransform(angle) {
+          return 'translate(' + baseLeft + 'px, ' + (baseTop + compensateY) + 'px) rotate(' + angle + 'deg) scale(' + SCALE + ')';
+        }
+
+        function updateZIndices() {
+          for (let i = 0; i < deck.length; i++) {
+            // activeIdx is top, cards after it go underneath
+            const stackPos = (i - activeIdx + deck.length) % deck.length;
+            deck[i].el.style.zIndex = 100 - stackPos;
+          }
+        }
+
+        // Commit any pending animations to inline styles
+        function commitAll() {
+          deck.forEach(d => {
+            const anims = d.el.getAnimations();
+            anims.forEach(a => {
+              try { a.commitStyles(); } catch(e) {}
+              a.cancel();
+            });
+          });
+        }
+
+        // Apply rest transforms to all cards based on current deck order
+        function applyRestState() {
+          commitAll();
+          for (let i = 0; i < deck.length; i++) {
+            const stackPos = (i - activeIdx + deck.length) % deck.length;
+            // Reassign rest angles based on stack position
+            deck[i].restAngle = welcomeAngle + stackPos * 2.5;
+            deck[i].el.style.transform = getRestTransform(deck[i].restAngle);
+            deck[i].el.style.transformOrigin = (cardW * 0.5) + 'px ' + (cardH * 0.85) + 'px';
+          }
+          updateZIndices();
+        }
+
+        function onPointerDown(e) {
+          if (state !== 'idle') return;
+          const topCard = deck[activeIdx].el;
+          const rect = topCard.getBoundingClientRect();
+          // Only respond to touches on the top card area
+          const px = e.touches ? e.touches[0].clientX : e.clientX;
+          const py = e.touches ? e.touches[0].clientY : e.clientY;
+          if (px < rect.left || px > rect.right || py < rect.top || py > rect.bottom) return;
+
+          state = 'dragging';
+          startX = px;
+          startY = py;
+          dragX = 0;
+          dragY = 0;
+          lastX = px;
+          lastTime = Date.now();
+          velocityX = 0;
+
+          // Commit current transforms
+          commitAll();
+
+          e.preventDefault();
+        }
+
+        function onPointerMove(e) {
+          if (state !== 'dragging') return;
+          const px = e.touches ? e.touches[0].clientX : e.clientX;
+          const py = e.touches ? e.touches[0].clientY : e.clientY;
+
+          const now = Date.now();
+          const dt = now - lastTime;
+          if (dt > 0) {
+            velocityX = (px - lastX) / dt; // px/ms
+          }
+          lastX = px;
+          lastTime = now;
+
+          dragX = px - startX;
+          dragY = (py - startY) * 0.3; // dampen vertical
+
+          const topCard = deck[activeIdx].el;
+          const restAngle = deck[activeIdx].restAngle;
+          const dragRotation = dragX * DRAG_ROTATION_FACTOR;
+          const clampedRotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, dragRotation));
+
+          topCard.style.transform = 'translate(' + (baseLeft + dragX) + 'px, ' + (baseTop + compensateY + dragY) + 'px) rotate(' + (restAngle + clampedRotation) + 'deg) scale(' + SCALE + ')';
+
+          // Promote second card based on progress
+          const progress = Math.min(1, Math.abs(dragX) / (SWIPE_THRESHOLD * 2));
+          const nextIdx = (activeIdx + 1) % deck.length;
+          const nextCard = deck[nextIdx];
+          const nextRestAngle = nextCard.restAngle;
+          // Interpolate second card toward top position
+          const promotedAngle = nextRestAngle + (welcomeAngle - nextRestAngle) * progress * 0.6;
+          nextCard.el.style.transform = getRestTransform(promotedAngle);
+
+          e.preventDefault();
+        }
+
+        function onPointerUp(e) {
+          if (state !== 'dragging') return;
+
+          const absDrag = Math.abs(dragX);
+          const absVelocity = Math.abs(velocityX);
+          const swipeRight = dragX > 0;
+
+          if (absDrag > SWIPE_THRESHOLD || absVelocity > VELOCITY_THRESHOLD) {
+            // DISMISS
+            state = 'dismissing';
+            const topCard = deck[activeIdx].el;
+            const restAngle = deck[activeIdx].restAngle;
+            const exitX = swipeRight ? window.innerWidth + cardW : -window.innerWidth - cardW;
+            const exitRotation = restAngle + (swipeRight ? 30 : -30);
+
+            const exitTransform = 'translate(' + exitX + 'px, ' + (baseTop + compensateY + dragY) + 'px) rotate(' + exitRotation + 'deg) scale(' + SCALE + ')';
+
+            const dismissAnim = topCard.animate([
+              { transform: topCard.style.transform },
+              { transform: exitTransform }
+            ], {
+              duration: 300,
+              easing: 'cubic-bezier(0.2, 0, 0, 1)',
+              fill: 'forwards'
+            });
+
+            // Promote next card simultaneously
+            const nextIdx = (activeIdx + 1) % deck.length;
+            const nextCard = deck[nextIdx];
+            nextCard.el.animate([
+              { transform: nextCard.el.style.transform },
+              { transform: getRestTransform(welcomeAngle) }
+            ], {
+              duration: 400,
+              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+              fill: 'forwards'
+            });
+
+            dismissAnim.onfinish = () => {
+              state = 'settling';
+              dismissAnim.commitStyles();
+              dismissAnim.cancel();
+
+              const dismissedIdx = activeIdx;
+              activeIdx = (activeIdx + 1) % deck.length;
+
+              // Update z-indices: dismissed goes to back
+              for (let i = 0; i < deck.length; i++) {
+                const stackPos = (i - activeIdx + deck.length) % deck.length;
+                deck[i].el.style.zIndex = 100 - stackPos;
+              }
+
+              // Commit promoted card's animation
+              const promAnims = deck[activeIdx].el.getAnimations();
+              promAnims.forEach(a => { try { a.commitStyles(); } catch(e) {} a.cancel(); });
+
+              // Compute new rest angles for all cards
+              const SETTLE_DURATION = 600;
+              const SETTLE_EASE = ARC_EASE; // 0.5, 0, 0, 1
+
+              for (let i = 0; i < deck.length; i++) {
+                const stackPos = (i - activeIdx + deck.length) % deck.length;
+                const targetAngle = welcomeAngle + stackPos * 2.5;
+                deck[i].restAngle = targetAngle;
+              }
+
+              // Animate all non-dismissed cards to their new rest positions smoothly
+              let settleCount = 0;
+              const nonDismissedCount = deck.length - 1;
+              for (let i = 0; i < deck.length; i++) {
+                if (i === dismissedIdx) continue;
+                const targetTransform = getRestTransform(deck[i].restAngle);
+                const anim = deck[i].el.animate([
+                  { transform: deck[i].el.style.transform },
+                  { transform: targetTransform }
+                ], {
+                  duration: SETTLE_DURATION,
+                  easing: SETTLE_EASE,
+                  fill: 'forwards'
+                });
+                anim.onfinish = () => {
+                  anim.commitStyles();
+                  anim.cancel();
+                  settleCount++;
+                };
+              }
+
+              // Dismissed card: arc in from opposite side to the back of the stack
+              const dismissed = deck[dismissedIdx];
+              const enterFromLeft = swipeRight; // swiped right → exits right → enters from left
+              const enterX = enterFromLeft ? (-window.innerWidth - cardW) : (window.innerWidth + cardW);
+              const backAngle = deck[dismissedIdx].restAngle;
+
+              // Start position: opposite side of screen, with exaggerated angle
+              const enterAngle = enterFromLeft ? backAngle - 20 : backAngle + 20;
+              const enterTransform = 'translate(' + enterX + 'px, ' + (baseTop + compensateY) + 'px) rotate(' + enterAngle + 'deg) scale(' + SCALE + ')';
+              const backTransform = getRestTransform(backAngle);
+
+              // Set to enter position immediately
+              dismissed.el.style.transform = enterTransform;
+
+              // Animate from opposite side into back of stack
+              const returnAnim = dismissed.el.animate([
+                { transform: enterTransform },
+                { transform: backTransform }
+              ], {
+                duration: SETTLE_DURATION,
+                easing: SETTLE_EASE,
+                fill: 'forwards'
+              });
+
+              returnAnim.onfinish = () => {
+                returnAnim.commitStyles();
+                returnAnim.cancel();
+                // Wait for all settles then go idle
+                const checkIdle = () => {
+                  if (settleCount >= nonDismissedCount) {
+                    applyRestState();
+                    state = 'idle';
+                  } else {
+                    requestAnimationFrame(checkIdle);
+                  }
+                };
+                checkIdle();
+              };
+            };
+
+          } else {
+            // SNAP BACK
+            state = 'snapping';
+            const topCard = deck[activeIdx].el;
+            const restTransform = getRestTransform(deck[activeIdx].restAngle);
+
+            const snapAnim = topCard.animate([
+              { transform: topCard.style.transform },
+              { transform: restTransform }
+            ], {
+              duration: 500,
+              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', // spring-like
+              fill: 'forwards'
+            });
+
+            // Snap second card back too
+            const nextIdx = (activeIdx + 1) % deck.length;
+            deck[nextIdx].el.animate([
+              { transform: deck[nextIdx].el.style.transform },
+              { transform: getRestTransform(deck[nextIdx].restAngle) }
+            ], {
+              duration: 500,
+              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+              fill: 'forwards'
+            });
+
+            snapAnim.onfinish = () => {
+              commitAll();
+              applyRestState();
+              state = 'idle';
+            };
+          }
+        }
+
+        // Bind touch events to document (capture phase for reliable mobile)
+        document.addEventListener('touchstart', onPointerDown, { passive: false });
+        document.addEventListener('touchmove', onPointerMove, { passive: false });
+        document.addEventListener('touchend', onPointerUp, { passive: false });
+        // Mouse fallback for testing
+        document.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('mousemove', onPointerMove);
+        document.addEventListener('mouseup', onPointerUp);
+
+        // Set initial state
+        applyRestState();
+      }
+
+      // Return to Series opens iMessage
+      returnBtn.addEventListener('click', () => {
+        window.location.href = 'sms:';
+      });
+
+      /* Initial entry: arc in first card, then show next card's corner */
+      function cardArcInInitial(card) {
+        cardArcSetup(card);
+        card.style.transform = 'rotate(' + ARC_ANGLE + 'deg)';
+        card.style.opacity = '1';
+        card.animate([
+          { transform: 'rotate(' + ARC_ANGLE + 'deg)' },
+          { transform: 'rotate(0deg)' }
+        ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+
+        // Also bring in the next card's corner
+        if (cardFlow.length > 1) {
+          const nextCard = cardFlow[1].card;
+          cardArcSetup(nextCard);
+          nextCard.style.opacity = '1';
+          nextCard.style.transform = 'rotate(' + (2 * ARC_ANGLE) + 'deg)';
+          nextCard.animate([
+            { transform: 'rotate(' + (2 * ARC_ANGLE) + 'deg)' },
+            { transform: 'rotate(' + ARC_ANGLE + 'deg)' }
+          ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+        }
+      }
+
+      /* ---- Rive setup ---- */
+      const r = new rive.Rive({
+        src: 'series.riv',
+        canvas: canvas,
+        autoplay: true,
+        useOffscreenRenderer: true,
+        stateMachines: 'State Machine 1',
+        fit: rive.Fit.FitWidth,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          const artboardW = r.artboardWidth;
+          const artboardH = r.artboardHeight;
+          const dpr = window.devicePixelRatio || 1;
+          const winW = window.innerWidth;
+          const scale = winW / artboardW;
+          const scaledH = artboardH * scale;
+
+          canvas.style.width = winW + 'px';
+          canvas.style.height = scaledH + 'px';
+          canvas.width = winW * dpr;
+          canvas.height = scaledH * dpr;
+          r.resizeDrawingSurfaceToCanvas();
+
+          const inputs = r.stateMachineInputs('State Machine 1');
+          num1Input = inputs.find(i => i.name === 'Number 1');
+
+          // At 3:16s, show CTA button
+          setTimeout(() => buttonShow(ctaBtn), 3267);
+        },
+        onStateChange: (event) => {
+          console.log('State changed:', JSON.stringify(event.data));
+        }
+      });
+
+      /* ---- CTA button: click → hide, go to "Before You Know", show gradient, then show Next Step after 0.8s ---- */
+      attachButtonStyle(ctaBtn, () => {
+        buttonHide(ctaBtn);
+
+        if (num1Input) {
+          num1Input.value = 1;
+        }
+
+        setTimeout(() => buttonShow(nextBtn), 800);
+      });
+
+      /* ---- Next Step button: click → hide, go to "Handoff", show name card 1.6s later ---- */
+      attachButtonStyle(nextBtn, () => {
+        buttonHide(nextBtn);
+
+        if (num1Input) {
+          num1Input.value = 2;
+        }
+
+        // Show name card and its next button after Handoff state
+        setTimeout(() => {
+          cardArcInInitial(nameCard);
+          buttonShowDim(nameCardNext);
+          // Show progress ring at step 0
+          updateProgressRing(0);
+          progressRing.style.transition = 'opacity 0.4s ease';
+          progressRing.style.opacity = '1';
+        }, 1200);
+      });
+
+      /* ---- Dim button: appears at 30%, brightens when condition met ---- */
+      function buttonShowDim(btn) {
+        buttonState.set(btn, true);
+        btn.style.opacity = '0.3';
+        btn.animate([
+          { bottom: '-60px' },
+          { bottom: '40px' }
+        ], {
+          duration: 640,
+          easing: 'cubic-bezier(0.5, 0, 0, 1)',
+          fill: 'forwards'
+        });
+      }
+
+      /* ---- Watch name card inputs to brighten its next button ---- */
+      const nameInputs = nameCard.querySelectorAll('input');
+      nameInputs.forEach(input => {
+        input.addEventListener('input', () => {
+          const allFilled = Array.from(nameInputs).every(i => i.value.trim() !== '');
+          nameCardNext.style.transition = 'opacity 0.3s ease';
+          nameCardNext.style.opacity = allFilled ? '1' : '0.3';
+        });
+      });
+
+      /* ---- Card flow: ordered list of cards with validation ---- */
+      const cardFlow = [
+        { card: nameCard, isValid: () => Array.from(nameInputs).every(i => i.value.trim() !== '') },
+        { card: birthdayCard, isValid: () => birthdayCard.querySelector('input').value !== '' },
+        { card: pronounsCard, isValid: () => pronounsCard.querySelector('.card-option-wrapper.selected') !== null },
+        { card: ethnicityCard, isValid: () => ethnicityCard.querySelector('.card-option-wrapper.selected') !== null },
+        { card: sexualityCard, isValid: () => sexualityCard.querySelector('.card-option-wrapper.selected') !== null },
+        { card: religionCard, isValid: () => religionCard.querySelector('.card-option-wrapper.selected') !== null },
+        { card: locationCard, isValid: () => locationCard.querySelector('#location-input').value.trim() !== '' },
+        { card: jobCard, isValid: () => document.getElementById('job-input').value.trim() !== '' },
+        { card: socialsCard, isValid: () => document.getElementById('email-input').value.trim() !== '' },
+        { card: interestsCard, isValid: () => interestsCard.querySelectorAll('.interest-tag.selected').length > 0 },
+        { card: photoCard, isValid: () => document.getElementById('photo-preview').style.display !== 'none' }
+      ];
+      let currentCardIndex = 0;
+
+      function updateNextOpacity() {
+        const valid = cardFlow[currentCardIndex].isValid();
+        nameCardNext.style.transition = 'opacity 0.3s ease';
+        nameCardNext.style.opacity = valid ? '1' : '0.3';
+        nameCardNext.style.pointerEvents = valid ? 'auto' : 'none';
+      }
+
+      /* ---- Name card next: go forward ---- */
+      attachButtonStyle(nameCardNext, () => {
+        // Block if keyboard is still open
+        if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+          document.activeElement.blur();
+          return;
+        }
+
+        // Block if current card isn't valid
+        if (!cardFlow[currentCardIndex].isValid()) return;
+
+        // If on last card, trigger final animation
+        if (currentCardIndex >= cardFlow.length - 1) {
+          playFinalAnimation();
+          return;
+        }
+
+        transitionForward();
+
+        // Dim next button until new card is valid
+        updateNextOpacity();
+
+        // Show go-back button if not on first card
+        if (currentCardIndex > 0 && !buttonState.get(goBackBtn)) {
+          buttonShow(goBackBtn);
+        }
+
+        // Show/hide skip for socials card
+        updateSkipVisibility();
+      });
+
+      /* ---- Watch all inputs to update next button ---- */
+      const birthdayInputs = birthdayCard.querySelectorAll('input');
+      birthdayInputs.forEach(input => {
+        input.addEventListener('input', () => updateNextOpacity());
+      });
+
+      /* ---- Birthday date picker: show/hide placeholder ---- */
+      const birthdayInput = document.getElementById('birthday-input');
+      const dateWrapper = birthdayInput.closest('.date-field-wrapper');
+
+      birthdayInput.addEventListener('change', () => {
+        if (birthdayInput.value) {
+          dateWrapper.classList.add('has-value');
+        } else {
+          dateWrapper.classList.remove('has-value');
+        }
+        birthdayInput.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+
+      /* ---- Pronouns card: radio selection ---- */
+      const pronounsOptions = pronounsCard.querySelectorAll('.card-option-wrapper');
+      pronounsOptions.forEach(wrapper => {
+        const row = wrapper.querySelector('.card-option-row');
+        row.addEventListener('click', () => {
+          // Deselect all
+          pronounsOptions.forEach(w => w.classList.remove('selected'));
+          // Select this one
+          wrapper.classList.add('selected');
+          updateNextOpacity();
+        });
+      });
+
+      /* ---- Ethnicity card: multi-select (toggle) ---- */
+      const ethnicityOptions = ethnicityCard.querySelectorAll('.card-option-wrapper');
+      ethnicityOptions.forEach(wrapper => {
+        const row = wrapper.querySelector('.card-option-row');
+        row.addEventListener('click', () => {
+          wrapper.classList.toggle('selected');
+          updateNextOpacity();
+        });
+      });
+
+      /* ---- Ethnicity scroll: mask-image fade ---- */
+      const ethnicityScroll = document.getElementById('ethnicity-scroll');
+
+      function updateScrollMask() {
+        const st = ethnicityScroll.scrollTop;
+        const sh = ethnicityScroll.scrollHeight;
+        const ch = ethnicityScroll.clientHeight;
+        const atTop = st <= 2;
+        const atBottom = st + ch >= sh - 2;
+
+        let mask;
+        if (atTop && atBottom) {
+          mask = 'none';
+        } else if (atTop) {
+          mask = 'linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%)';
+        } else if (atBottom) {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black 100%)';
+        } else {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%)';
+        }
+        ethnicityScroll.style.webkitMaskImage = mask;
+        ethnicityScroll.style.maskImage = mask;
+      }
+
+      ethnicityScroll.addEventListener('scroll', updateScrollMask);
+
+      /* Set scroll height to show ~4 items */
+      function setScrollHeight() {
+        const items = ethnicityScroll.querySelectorAll('.card-option-wrapper');
+        if (items.length >= 4) {
+          let h = 0;
+          for (let i = 0; i < 4; i++) {
+            h += items[i].offsetHeight;
+          }
+          ethnicityScroll.style.maxHeight = h + 'px';
+        }
+      }
+      // Defer until card is visible to measure
+      const scrollObserver = new MutationObserver(() => {
+        if (ethnicityCard.style.opacity === '1') {
+          setScrollHeight();
+          updateScrollMask();
+          scrollObserver.disconnect();
+        }
+      });
+      scrollObserver.observe(ethnicityCard, { attributes: true, attributeFilter: ['style'] });
+
+      /* ---- Sexuality card: multi-select (toggle) ---- */
+      const sexualityOptions = sexualityCard.querySelectorAll('.card-option-wrapper');
+      sexualityOptions.forEach(wrapper => {
+        const row = wrapper.querySelector('.card-option-row');
+        row.addEventListener('click', () => {
+          wrapper.classList.toggle('selected');
+          updateNextOpacity();
+        });
+      });
+
+      /* ---- Sexuality scroll: mask-image fade ---- */
+      const sexualityScroll = document.getElementById('sexuality-scroll');
+
+      function updateSexualityScrollMask() {
+        const st = sexualityScroll.scrollTop;
+        const sh = sexualityScroll.scrollHeight;
+        const ch = sexualityScroll.clientHeight;
+        const atTop = st <= 2;
+        const atBottom = st + ch >= sh - 2;
+
+        let mask;
+        if (atTop && atBottom) {
+          mask = 'none';
+        } else if (atTop) {
+          mask = 'linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%)';
+        } else if (atBottom) {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black 100%)';
+        } else {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%)';
+        }
+        sexualityScroll.style.webkitMaskImage = mask;
+        sexualityScroll.style.maskImage = mask;
+      }
+
+      sexualityScroll.addEventListener('scroll', updateSexualityScrollMask);
+
+      function setSexualityScrollHeight() {
+        const items = sexualityScroll.querySelectorAll('.card-option-wrapper');
+        if (items.length >= 4) {
+          let h = 0;
+          for (let i = 0; i < 4; i++) {
+            h += items[i].offsetHeight;
+          }
+          sexualityScroll.style.maxHeight = h + 'px';
+        }
+      }
+      const sexualityScrollObserver = new MutationObserver(() => {
+        if (sexualityCard.style.opacity === '1') {
+          setSexualityScrollHeight();
+          updateSexualityScrollMask();
+          sexualityScrollObserver.disconnect();
+        }
+      });
+      sexualityScrollObserver.observe(sexualityCard, { attributes: true, attributeFilter: ['style'] });
+
+      /* ---- Religion card: multi-select (toggle) ---- */
+      const religionOptions = religionCard.querySelectorAll('.card-option-wrapper');
+      religionOptions.forEach(wrapper => {
+        const row = wrapper.querySelector('.card-option-row');
+        row.addEventListener('click', () => {
+          wrapper.classList.toggle('selected');
+          updateNextOpacity();
+        });
+      });
+
+      /* ---- Religion scroll: mask-image fade ---- */
+      const religionScroll = document.getElementById('religion-scroll');
+
+      function updateReligionScrollMask() {
+        const st = religionScroll.scrollTop;
+        const sh = religionScroll.scrollHeight;
+        const ch = religionScroll.clientHeight;
+        const atTop = st <= 2;
+        const atBottom = st + ch >= sh - 2;
+
+        let mask;
+        if (atTop && atBottom) {
+          mask = 'none';
+        } else if (atTop) {
+          mask = 'linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%)';
+        } else if (atBottom) {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black 100%)';
+        } else {
+          mask = 'linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%)';
+        }
+        religionScroll.style.webkitMaskImage = mask;
+        religionScroll.style.maskImage = mask;
+      }
+
+      religionScroll.addEventListener('scroll', updateReligionScrollMask);
+
+      function setReligionScrollHeight() {
+        const items = religionScroll.querySelectorAll('.card-option-wrapper');
+        if (items.length >= 4) {
+          let h = 0;
+          for (let i = 0; i < 4; i++) {
+            h += items[i].offsetHeight;
+          }
+          religionScroll.style.maxHeight = h + 'px';
+        }
+      }
+      const religionScrollObserver = new MutationObserver(() => {
+        if (religionCard.style.opacity === '1') {
+          setReligionScrollHeight();
+          updateReligionScrollMask();
+          religionScrollObserver.disconnect();
+        }
+      });
+      religionScrollObserver.observe(religionCard, { attributes: true, attributeFilter: ['style'] });
+
+      /* ---- Job input watcher ---- */
+      document.getElementById('job-input').addEventListener('input', () => updateNextOpacity());
+
+      /* ---- Skip button for socials card ---- */
+      const skipSocials = document.getElementById('skip-socials');
+      const socialsIndex = cardFlow.findIndex(c => c.card === socialsCard);
+
+      const skipInterests = document.getElementById('skip-interests');
+      const interestsIndex = cardFlow.findIndex(c => c.card === interestsCard);
+
+      function updateSkipVisibility() {
+        if (currentCardIndex === socialsIndex) {
+          skipSocials.classList.add('visible');
+        } else {
+          skipSocials.classList.remove('visible');
+        }
+        if (currentCardIndex === interestsIndex) {
+          skipInterests.classList.add('visible');
+        } else {
+          skipInterests.classList.remove('visible');
+        }
+      }
+
+      skipSocials.addEventListener('click', () => {
+        if (currentCardIndex !== socialsIndex) return;
+        if (currentCardIndex >= cardFlow.length - 1) return;
+        transitionForward();
+        updateNextOpacity();
+        updateSkipVisibility();
+      });
+
+      skipSocials.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (currentCardIndex !== socialsIndex) return;
+        if (currentCardIndex >= cardFlow.length - 1) return;
+        transitionForward();
+        updateNextOpacity();
+        updateSkipVisibility();
+      });
+
+      skipInterests.addEventListener('click', () => {
+        if (currentCardIndex !== interestsIndex) return;
+        if (currentCardIndex >= cardFlow.length - 1) return;
+        transitionForward();
+        updateNextOpacity();
+        updateSkipVisibility();
+      });
+
+      skipInterests.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (currentCardIndex !== interestsIndex) return;
+        if (currentCardIndex >= cardFlow.length - 1) return;
+        transitionForward();
+        updateNextOpacity();
+        updateSkipVisibility();
+      });
+
+      /* ---- Socials card: iOS-style confirm flow ---- */
+      const socialOverlay = document.getElementById('social-confirm-overlay');
+      const socialTitle = document.getElementById('social-confirm-title');
+      const socialMessage = document.getElementById('social-confirm-message');
+      const socialOpenBtn = document.getElementById('social-confirm-open');
+      const socialManualBtn = document.getElementById('social-confirm-manual');
+      const socialCancelBtn = document.getElementById('social-confirm-cancel');
+      let activeSocialField = null;
+
+      const socialURLs = {
+        linkedin: 'https://www.linkedin.com/login',
+        instagram: 'https://www.instagram.com/accounts/login/',
+        x: 'https://x.com/i/flow/login'
+      };
+
+      const socialNames = {
+        linkedin: 'LinkedIn',
+        instagram: 'Instagram',
+        x: 'X'
+      };
+
+      function showSocialConfirm(field) {
+        activeSocialField = field;
+        const social = field.dataset.social;
+        const name = socialNames[social];
+        socialTitle.textContent = 'Open ' + name + '?';
+        socialMessage.textContent = 'This will redirect you to log in with your ' + name + ' account.';
+        socialOverlay.style.display = 'flex';
+        requestAnimationFrame(() => {
+          socialOverlay.classList.add('visible');
+        });
+      }
+
+      function hideSocialConfirm() {
+        socialOverlay.classList.remove('visible');
+        setTimeout(() => {
+          socialOverlay.style.display = 'none';
+          activeSocialField = null;
+        }, 300);
+      }
+
+      // Social field click handlers
+      document.querySelectorAll('.social-field').forEach(field => {
+        const social = field.dataset.social;
+        const input = field.querySelector('input');
+
+        if (social === 'email') {
+          // Email is always a normal text input
+          input.addEventListener('input', () => updateNextOpacity());
+          return;
+        }
+
+        // For social platforms, show confirm dialog on tap
+        input.addEventListener('click', () => {
+          if (!input.readOnly) return; // Already in manual mode
+          showSocialConfirm(field);
+        });
+
+        input.addEventListener('input', () => updateNextOpacity());
+      });
+
+      // "Open" button — redirect to social platform
+      socialOpenBtn.addEventListener('click', () => {
+        if (!activeSocialField) return;
+        const social = activeSocialField.dataset.social;
+        window.open(socialURLs[social], '_blank');
+        hideSocialConfirm();
+      });
+
+      // "Enter Manually" button — convert to normal text input
+      socialManualBtn.addEventListener('click', () => {
+        if (!activeSocialField) return;
+        const input = activeSocialField.querySelector('input');
+        input.readOnly = false;
+        input.placeholder = socialNames[activeSocialField.dataset.social] + ' username';
+        hideSocialConfirm();
+        setTimeout(() => input.focus(), 350);
+      });
+
+      // "Cancel" button
+      socialCancelBtn.addEventListener('click', () => {
+        hideSocialConfirm();
+      });
+
+      // Close on overlay tap
+      socialOverlay.addEventListener('click', (e) => {
+        if (e.target === socialOverlay || e.target.parentElement === socialOverlay) {
+          hideSocialConfirm();
+        }
+      });
+
+      /* ---- Interests card: search and tag system ---- */
+      const interestsList = [
+        'Photography', 'Cooking', 'Travel', 'Reading', 'Gaming', 'Music',
+        'Fitness', 'Yoga', 'Running', 'Hiking', 'Cycling', 'Swimming',
+        'Dancing', 'Painting', 'Drawing', 'Writing', 'Film', 'Theater',
+        'Fashion', 'Design', 'Coding', 'Startups', 'Investing', 'Marketing',
+        'Podcasts', 'Volunteering', 'Meditation', 'Wine', 'Coffee', 'Baking',
+        'Gardening', 'Pets', 'Dogs', 'Cats', 'Sports', 'Basketball',
+        'Soccer', 'Tennis', 'Golf', 'Skiing', 'Surfing', 'Climbing',
+        'Board Games', 'Anime', 'K-Pop', 'Jazz', 'Hip Hop', 'EDM',
+        'Concerts', 'Museums', 'Brunch', 'Karaoke', 'Trivia', 'Comedy',
+        'Astrology', 'Thrifting', 'Sneakers', 'Tattoos', 'Languages', 'Politics'
+      ];
+      const interestsSearch = document.getElementById('interests-search');
+      const interestsTagsContainer = document.getElementById('interests-tags');
+      const selectedInterests = new Set();
+
+      function renderInterestTags(filter = '') {
+        interestsTagsContainer.innerHTML = '';
+        const query = filter.toLowerCase().trim();
+        const filtered = query
+          ? interestsList.filter(i => i.toLowerCase().includes(query))
+          : interestsList;
+
+        // Show selected first, then unselected (up to a reasonable limit)
+        const sorted = [...filtered].sort((a, b) => {
+          const aSelected = selectedInterests.has(a) ? 0 : 1;
+          const bSelected = selectedInterests.has(b) ? 0 : 1;
+          return aSelected - bSelected;
+        });
+
+        const toShow = sorted.slice(0, 20);
+
+        // If search has no matches and query is non-empty, show a "create" tag
+        if (toShow.length === 0 && query) {
+          const createName = filter.trim();
+          const tag = document.createElement('div');
+          tag.className = 'interest-tag create-tag';
+          tag.innerHTML = `<span>+ ${createName}</span>`;
+          tag.addEventListener('click', () => {
+            // Add to master list and select it
+            if (!interestsList.includes(createName)) {
+              interestsList.push(createName);
+            }
+            selectedInterests.add(createName);
+            interestsSearch.value = '';
+            renderInterestTags();
+            updateNextOpacity();
+          });
+          interestsTagsContainer.appendChild(tag);
+        }
+
+        toShow.forEach(interest => {
+          const tag = document.createElement('div');
+          tag.className = 'interest-tag' + (selectedInterests.has(interest) ? ' selected' : '');
+          tag.innerHTML = `<span>${interest}</span><span class="tag-remove">✕</span>`;
+          tag.addEventListener('click', () => {
+            if (selectedInterests.has(interest)) {
+              selectedInterests.delete(interest);
+            } else {
+              selectedInterests.add(interest);
+            }
+            renderInterestTags(interestsSearch.value);
+            updateNextOpacity();
+          });
+          interestsTagsContainer.appendChild(tag);
+        });
+      }
+
+      interestsSearch.addEventListener('input', () => {
+        renderInterestTags(interestsSearch.value);
+      });
+
+      // Initial render when card becomes visible (deferred)
+      const interestsObserver = new MutationObserver(() => {
+        if (interestsCard.style.opacity === '1' && interestsTagsContainer.children.length === 0) {
+          renderInterestTags();
+        }
+      });
+      interestsObserver.observe(interestsCard, { attributes: true, attributeFilter: ['style'] });
+
+      /* ---- Photo upload card ---- */
+      const photoUploadArea = document.getElementById('photo-upload-area');
+      const photoFileInput = document.getElementById('photo-file-input');
+      const photoPreview = document.getElementById('photo-preview');
+      const photoUploadIcon = document.getElementById('photo-upload-icon');
+
+      photoUploadArea.addEventListener('click', () => {
+        photoFileInput.click();
+      });
+
+      photoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          photoPreview.src = ev.target.result;
+          photoPreview.style.display = 'block';
+          photoUploadIcon.style.display = 'none';
+          updateNextOpacity();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      /* ---- Welcome card: populate on show ---- */
+      const welcomePhotoBg = document.getElementById('welcome-photo-bg');
+      const welcomeName = document.getElementById('welcome-name');
+      const welcomeObserver = new MutationObserver(() => {
+        if (welcomeCard.style.opacity === '1') {
+          welcomeCard.style.pointerEvents = 'auto';
+          // Set background to uploaded photo
+          const preview = document.getElementById('photo-preview');
+          if (preview.src) {
+            welcomePhotoBg.style.backgroundImage = 'url(' + preview.src + ')';
+          }
+          // Set first name
+          const firstNameInput = nameCard.querySelector('input[placeholder="First name"]');
+          const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+          welcomeName.textContent = 'Welcome, ' + (firstName || 'Friend') + '!';
+        } else {
+          welcomeCard.style.pointerEvents = 'none';
+        }
+      });
+      welcomeObserver.observe(welcomeCard, { attributes: true, attributeFilter: ['style'] });
+
+      /* ---- Location autocomplete ---- */
+      const locationInput = document.getElementById('location-input');
+      const locationDropdown = document.getElementById('location-dropdown');
+      let locationTimer = null;
+
+      function positionLocationDropdown() {
+        const fieldLine = document.querySelector('#location-card .field-line');
+        if (!fieldLine) return;
+        const rect = fieldLine.getBoundingClientRect();
+        locationDropdown.style.left = rect.left + 'px';
+        locationDropdown.style.top = (rect.bottom + 8) + 'px';
+        locationDropdown.style.width = rect.width + 'px';
+      }
+
+      locationInput.addEventListener('input', () => {
+        updateNextOpacity();
+        const q = locationInput.value.trim();
+        if (q.length < 2) {
+          locationDropdown.classList.remove('visible');
+          locationDropdown.innerHTML = '';
+          return;
+        }
+        clearTimeout(locationTimer);
+        locationTimer = setTimeout(() => {
+          fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q), {
+            headers: { 'Accept-Language': 'en' }
+          })
+            .then(r => r.json())
+            .then(results => {
+              locationDropdown.innerHTML = '';
+              if (results.length === 0) {
+                locationDropdown.classList.remove('visible');
+                return;
+              }
+              results.forEach(r => {
+                const item = document.createElement('div');
+                item.className = 'location-item';
+                item.innerHTML = '<span>' + r.display_name + '</span>';
+                item.addEventListener('click', () => {
+                  locationInput.value = r.display_name;
+                  locationDropdown.classList.remove('visible');
+                  locationDropdown.innerHTML = '';
+                  locationInput.blur();
+                  updateNextOpacity();
+                });
+                locationDropdown.appendChild(item);
+              });
+              positionLocationDropdown();
+              locationDropdown.classList.add('visible');
+            })
+            .catch(() => {
+              locationDropdown.classList.remove('visible');
+            });
+        }, 300);
+      });
+
+      /* ---- Go back: go to previous card ---- */
+      attachButtonStyle(goBackBtn, () => {
+        if (currentCardIndex <= 0) return;
+
+        transitionBackward();
+
+        // Hide go-back if back to first card
+        if (currentCardIndex === 0) {
+          buttonHide(goBackBtn);
+        }
+
+        // Update next button opacity for the card we're going back to
+        updateNextOpacity();
+
+        // Show/hide skip for socials card
+        updateSkipVisibility();
+      });
+    })();
+  </script>
+</body>
+</html>
