@@ -7,6 +7,19 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Series</title>
+  <script>
+    // Responsive breakpoint: reload on crossing 480px
+    const BREAKPOINT = 480;
+    const isDesktop = window.innerWidth > BREAKPOINT;
+    let lastWasDesktop = isDesktop;
+    window.addEventListener('resize', () => {
+      const nowDesktop = window.innerWidth > BREAKPOINT;
+      if (nowDesktop !== lastWasDesktop) {
+        window.location.reload();
+      }
+      lastWasDesktop = nowDesktop;
+    });
+  </script>
   <style>
     @font-face {
       font-family: 'SF Pro Display';
@@ -182,7 +195,7 @@
       position: fixed;
       width: calc(256 / 393 * 100vw * 1.155);
       aspect-ratio: 690 / 920;
-      border-radius: 25.6px;
+      border-radius: 3.2vh;
       overflow: hidden;
       opacity: 0;
       z-index: 3;
@@ -892,30 +905,62 @@
 
     .welcome-blur-layer:nth-child(1) {
       height: 100%;
+      -webkit-backdrop-filter: blur(1px);
+      backdrop-filter: blur(1px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(2) {
+      height: 90%;
+      -webkit-backdrop-filter: blur(1.5px);
+      backdrop-filter: blur(1.5px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(3) {
+      height: 80%;
       -webkit-backdrop-filter: blur(2px);
       backdrop-filter: blur(2px);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
     }
 
-    .welcome-blur-layer:nth-child(2) {
-      height: 75%;
-      -webkit-backdrop-filter: blur(4px);
-      backdrop-filter: blur(4px);
+    .welcome-blur-layer:nth-child(4) {
+      height: 68%;
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
     }
 
-    .welcome-blur-layer:nth-child(3) {
-      height: 50%;
+    .welcome-blur-layer:nth-child(5) {
+      height: 55%;
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(6) {
+      height: 42%;
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
       mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
     }
 
-    .welcome-blur-layer:nth-child(4) {
+    .welcome-blur-layer:nth-child(7) {
       height: 30%;
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    }
+
+    .welcome-blur-layer:nth-child(8) {
+      height: 18%;
       -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
@@ -972,6 +1017,14 @@
       padding-top: 10px !important;
       gap: 8px !important;
     }
+    /* ---- Desktop logo & account button (hidden on mobile) ---- */
+    #desktop-logo {
+      display: none;
+    }
+    #already-account-btn {
+      display: none;
+    }
+
     /* ---- Progress Ring ---- */
     #progress-ring {
       position: fixed;
@@ -1003,6 +1056,213 @@
       stroke-linecap: round;
       transition: stroke-dashoffset 0.5s cubic-bezier(0.5, 0, 0, 1);
     }
+    /* ---- Desktop overrides ---- */
+    @media (min-width: 481px) {
+      .card {
+        width: calc(46.2vh * 690 / 920);
+      }
+
+      #rive-wrapper {
+        pointer-events: none;
+        position: relative;
+        z-index: 0;
+      }
+
+      #rive-canvas {
+        pointer-events: none;
+      }
+
+      .button_style {
+        z-index: 10;
+      }
+
+      /* ---- Button sizing: single = 26vw, pair = 12.5vw each with 1vw gap ---- */
+      #cta-button,
+      #return-to-series {
+        width: 26vw;
+        padding: 13.6px 14px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      /* Next step (single): CSS-drawn box, 26vw, #202020 fill */
+      #next-step-button {
+        width: 26vw;
+        height: auto;
+        padding: 13.6px 14px;
+        border-radius: 8px;
+        background: #202020;
+        border: none;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+      }
+
+      #next-step-button img {
+        height: 20px;
+        width: auto;
+        filter: brightness(0) invert(1);
+        display: block;
+      }
+
+      /* Paired: name-card-next = #202020 fill, go-back = stroke only */
+      #name-card-next {
+        width: 12.5vw;
+        height: auto;
+        padding: 13.6px 14px;
+        border-radius: 8px;
+        background: #202020;
+        border: none;
+        left: calc(50% + 0.5vw);
+        right: auto;
+        transform: none;
+      }
+
+      #name-card-next img {
+        height: 20px;
+        width: auto;
+        filter: brightness(0) invert(1);
+        display: block;
+      }
+
+      #go-back-btn {
+        width: 12.5vw;
+        height: auto;
+        padding: 11.1px 11.5px;
+        border-radius: 8px;
+        background: transparent;
+        border: 2.5px solid rgba(32, 32, 32, 0.8);
+        left: auto;
+        right: calc(50% + 0.5vw);
+        transform: none;
+      }
+
+      #go-back-btn img {
+        height: 20px;
+        width: auto;
+        filter: none;
+        display: block;
+        transform: scaleX(1);
+        opacity: 0.8;
+      }
+
+      .card-title {
+        white-space: normal !important;
+        font-size: 2.975vh !important;
+      }
+
+      .card .card-content {
+        padding: 3.8vh 3.1vh 5.2vh 3.1vh;
+        gap: 2.8vh;
+      }
+
+      .card .card-field {
+        padding-top: 2.1vh;
+        gap: 1vh;
+      }
+
+      .card .card-option-wrapper {
+        padding-top: 2.1vh;
+        gap: 1vh;
+      }
+
+      .card .card-field input,
+      .date-field-wrapper .date-placeholder,
+      .date-field-wrapper input[type="date"],
+      .card .card-option-row .option-label {
+        font-size: 2.55vh;
+      }
+
+      .card .card-subtitle {
+        font-size: 1.91vh;
+        margin-top: -1.5vh;
+      }
+
+      #welcome-card .card-title {
+        font-size: 3.4vh !important;
+      }
+
+      .interests-search-bar input {
+        font-size: 1.91vh;
+      }
+
+      .interest-tag {
+        font-size: 1.49vh;
+        padding: 0.85vh 1.49vh;
+        gap: 5px;
+      }
+
+      .interest-tag .tag-remove {
+        font-size: 1.275vh;
+      }
+
+      .social-field-icon {
+        height: 2.55vh;
+        width: 2.55vh;
+      }
+
+      .card .option-radio {
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Skip buttons: plain text centered 24px above arrow buttons */
+      #skip-socials,
+      #skip-interests {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        bottom: 103px;
+        z-index: 10;
+      }
+
+      /* Desktop logo: top-left, 24px from edges */
+      #desktop-logo {
+        display: block;
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        z-index: 50;
+        line-height: 0;
+      }
+      #desktop-logo img {
+        height: 20px;
+        width: auto;
+      }
+
+      /* Already have an account button: top-right */
+      #already-account-btn {
+        display: block;
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 50;
+        background: rgba(0, 0, 0, 0.04);
+        border: none;
+        border-radius: 8px;
+        padding: 16px 24px;
+        font-family: 'SF Pro Display', -apple-system, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: #000000;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: opacity 0.4s ease;
+      }
+
+      /* Progress ring: top center, 24px from top, 20x20 */
+      #progress-ring {
+        left: 50% !important;
+        top: 24px !important;
+        transform: translateX(-50%);
+        width: 26px !important;
+        height: 26px !important;
+      }
+      #progress-ring svg {
+        width: 26px !important;
+        height: 26px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1011,6 +1271,12 @@
   </div>
 
   <!-- Progress Ring: 11 steps -->
+  <a id="desktop-logo" href="https://series.so" target="_blank">
+    <img src="Desktop Logo.png" alt="Series">
+  </a>
+
+  <button id="already-account-btn">Login</button>
+
   <div id="progress-ring">
     <svg viewBox="0 0 24 24">
       <circle class="ring-bg" cx="12" cy="12" r="9.6"/>
@@ -1419,6 +1685,10 @@
       <div class="welcome-blur-layer"></div>
       <div class="welcome-blur-layer"></div>
       <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
+      <div class="welcome-blur-layer"></div>
     </div>
     <div class="welcome-dark-gradient"></div>
     <img class="card-bg" src="Transparent Card.png" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;">
@@ -1462,8 +1732,32 @@
       const nextBtn = document.getElementById('next-step-button');
       const nameCardNext = document.getElementById('name-card-next');
       const goBackBtn = document.getElementById('go-back-btn');
+      // Desktop: swap button SVGs
+      if (isDesktop) {
+        goBackBtn.querySelector('img').src = 'Back_Desktop.svg';
+        nameCardNext.querySelector('img').src = 'Next_Desktop.svg';
+        nextBtn.querySelector('img').src = 'Next_Desktop.svg';
+      }
       const returnBtn = document.getElementById('return-to-series');
       const progressRing = document.getElementById('progress-ring');
+      const alreadyAccountBtn = document.getElementById('already-account-btn');
+
+      // "Already have an account" button: press effect + link
+      if (isDesktop && alreadyAccountBtn) {
+        alreadyAccountBtn.addEventListener('mousedown', () => {
+          alreadyAccountBtn.style.transform = 'scale(0.98)';
+          alreadyAccountBtn.style.transition = 'transform 0.1s ease-out';
+        });
+        alreadyAccountBtn.addEventListener('mouseup', () => {
+          alreadyAccountBtn.style.transform = 'scale(1)';
+          alreadyAccountBtn.style.transition = 'transform 0.08s ease-out';
+          window.open('https://series.so', '_blank');
+        });
+        alreadyAccountBtn.addEventListener('mouseleave', () => {
+          alreadyAccountBtn.style.transform = 'scale(1)';
+          alreadyAccountBtn.style.transition = 'transform 0.08s ease-out';
+        });
+      }
       const progressFg = progressRing.querySelector('.ring-fg');
       const RING_CIRCUMFERENCE = 60.319;
       const RING_STEPS = 11;
@@ -1488,6 +1782,7 @@
       const photoCard = document.getElementById('photo-card');
       const welcomeCard = document.getElementById('welcome-card');
       const EASE = 'cubic-bezier(0.5, 0, 0, 1)';
+      const BTN_BOTTOM = isDesktop ? '32px' : '40px';
 
       let num1Input = null;
 
@@ -1498,7 +1793,7 @@
         buttonState.set(btn, true);
         btn.animate([
           { bottom: '-60px', opacity: 0 },
-          { bottom: '40px', opacity: 1 }
+          { bottom: BTN_BOTTOM, opacity: 1 }
         ], {
           duration: 400,
           easing: EASE,
@@ -1509,12 +1804,12 @@
       function buttonHide(btn, onComplete) {
         buttonState.set(btn, false);
         btn.getAnimations().forEach(a => a.cancel());
-        btn.style.bottom = '40px';
+        btn.style.bottom = BTN_BOTTOM;
         btn.style.opacity = '1';
         btn.style.transform = getBaseTransform(btn) + ' scale(1)';
 
         const anim = btn.animate([
-          { bottom: '40px', opacity: 1 },
+          { bottom: BTN_BOTTOM, opacity: 1 },
           { bottom: '-60px', opacity: 0 }
         ], {
           duration: 450,
@@ -1530,14 +1825,26 @@
       }
 
       function getBaseTransform(btn) {
+        if (isDesktop) {
+          if (btn.id === 'next-step-button' || btn.id === 'cta-button' || btn.id === 'return-to-series')
+            return 'translateX(-50%)';
+          if (btn.id === 'name-card-next' && nameCardNextIsSingle)
+            return 'translateX(-50%)';
+          return '';
+        }
         return (btn.id === 'next-step-button' || btn.id === 'name-card-next' || btn.id === 'go-back-btn')
           ? 'translateY(50%)'
           : 'translateX(-50%) translateY(50%)';
       }
 
+      /* Desktop: track whether name-card-next is in single-button mode */
+      let nameCardNextIsSingle = isDesktop;
+
       function buttonPressStart(btn, e) {
         if (!buttonState.get(btn)) return;
         e.preventDefault();
+        // Cancel forward-filled animations so inline style takes effect
+        btn.getAnimations().forEach(a => { a.commitStyles(); a.cancel(); });
         btn.style.transform = getBaseTransform(btn) + ' scale(0.98)';
         btn.style.transition = 'transform 0.1s ease-out';
       }
@@ -1576,8 +1883,8 @@
       /* ---- Spatial card arc system ---- */
       /* Cards live on a circular arc. Each card slot is ARC_ANGLE apart.
          Adjacent cards always show their corners. All cards rotate together. */
-      const ARC_RADIUS = 586;
-      const ARC_ANGLE = 36;
+      const ARC_RADIUS = isDesktop ? 586 * 1.8 * 1.35 : 586;
+      const ARC_ANGLE = isDesktop ? 15 : 36;
       const ARC_DURATION = 640;
       const ARC_EASE = 'cubic-bezier(0.5, 0, 0, 1)';
 
@@ -1595,30 +1902,49 @@
         card.style.transformOrigin = ox + 'px ' + oy + 'px';
       }
 
+      /* How many cards visible on each side */
+      const VISIBLE_RANGE = isDesktop ? 2 : 1;
+      const SIDE_SCALE = isDesktop ? 1 : 1;
+      const SIDE_OPACITY = isDesktop ? 0.3 : 1;
+
+      /* Get scale and opacity for a card at given offset from center */
+      function getCardStyle(offset) {
+        const absOff = Math.abs(offset);
+        if (absOff === 0) return { scale: 1, opacity: 1, interactive: true };
+        if (isDesktop) return { scale: SIDE_SCALE, opacity: SIDE_OPACITY, interactive: false };
+        return { scale: 1, opacity: 1, interactive: false };
+      }
+
       /* Snap a card to an angle instantly (no animation) */
-      function cardSnapTo(card, angle) {
+      function cardSnapTo(card, angle, offset) {
         cardArcSetup(card);
-        card.style.transform = 'rotate(' + angle + 'deg)';
-        card.style.opacity = '1';
+        const style = getCardStyle(offset !== undefined ? offset : 0);
+        card.style.transform = 'rotate(' + angle + 'deg) scale(' + style.scale + ')';
+        card.style.opacity = String(style.opacity);
+        card.style.pointerEvents = style.interactive ? 'auto' : 'none';
       }
 
       /* Animate a card from one angle to another */
-      function cardArcAnimate(card, fromAngle, toAngle) {
+      function cardArcAnimate(card, fromAngle, toAngle, fromOffset, toOffset) {
         cardArcSetup(card);
-        card.style.opacity = '1';
-        card.style.transform = 'rotate(' + fromAngle + 'deg)';
-        return card.animate([
-          { transform: 'rotate(' + fromAngle + 'deg)' },
-          { transform: 'rotate(' + toAngle + 'deg)' }
+        const fromStyle = getCardStyle(fromOffset !== undefined ? fromOffset : 0);
+        const toStyle = getCardStyle(toOffset !== undefined ? toOffset : 0);
+        card.style.opacity = String(Math.max(fromStyle.opacity, toStyle.opacity));
+        card.style.transform = 'rotate(' + fromAngle + 'deg) scale(' + fromStyle.scale + ')';
+        card.style.pointerEvents = toStyle.interactive ? 'auto' : 'none';
+        const anim = card.animate([
+          { transform: 'rotate(' + fromAngle + 'deg) scale(' + fromStyle.scale + ')', opacity: fromStyle.opacity },
+          { transform: 'rotate(' + toAngle + 'deg) scale(' + toStyle.scale + ')', opacity: toStyle.opacity }
         ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+        return anim;
       }
 
       /* Position all visible cards based on current index */
       function layoutCards() {
         cardFlow.forEach((entry, i) => {
           const offset = i - currentCardIndex;
-          if (offset >= -1 && offset <= 1) {
-            cardSnapTo(entry.card, offset * ARC_ANGLE);
+          if (offset >= -VISIBLE_RANGE && offset <= VISIBLE_RANGE) {
+            cardSnapTo(entry.card, offset * ARC_ANGLE, offset);
           } else {
             entry.card.style.opacity = '0';
           }
@@ -1629,37 +1955,39 @@
       function transitionForward() {
         if (currentCardIndex >= cardFlow.length - 1) return;
 
-        // Animate cards that are currently visible
-        const prev = currentCardIndex - 1;
-        const curr = currentCardIndex;
-        const next = currentCardIndex + 1;
-        const nextNext = currentCardIndex + 2;
+        const newIndex = currentCardIndex + 1;
 
-        // Previous card (if exists): -ARC_ANGLE → -2*ARC_ANGLE
-        if (prev >= 0) {
-          cardArcAnimate(cardFlow[prev].card, -ARC_ANGLE, -2 * ARC_ANGLE);
-        }
-        // Current card: 0 → -ARC_ANGLE
-        cardArcAnimate(cardFlow[curr].card, 0, -ARC_ANGLE);
-        // Next card: +ARC_ANGLE → 0
-        cardArcAnimate(cardFlow[next].card, ARC_ANGLE, 0);
-        // Next-next card (if exists): snap to +ARC_ANGLE so it peeks in
-        if (nextNext < cardFlow.length) {
-          cardSnapTo(cardFlow[nextNext].card, 2 * ARC_ANGLE);
-          cardArcAnimate(cardFlow[nextNext].card, 2 * ARC_ANGLE, ARC_ANGLE);
+        // Animate all cards in visible range (old and new positions)
+        for (let i = 0; i < cardFlow.length; i++) {
+          const oldOffset = i - currentCardIndex;
+          const newOffset = i - newIndex;
+
+          // Was visible or will be visible
+          if (oldOffset >= -(VISIBLE_RANGE + 1) && oldOffset <= (VISIBLE_RANGE + 1) &&
+              (Math.abs(oldOffset) <= VISIBLE_RANGE || Math.abs(newOffset) <= VISIBLE_RANGE)) {
+
+            if (Math.abs(oldOffset) > VISIBLE_RANGE && Math.abs(newOffset) <= VISIBLE_RANGE) {
+              // Card entering view — snap first then animate with fade in
+              cardSnapTo(cardFlow[i].card, oldOffset * ARC_ANGLE, oldOffset);
+              cardFlow[i].card.style.opacity = '0';
+              cardArcAnimate(cardFlow[i].card, oldOffset * ARC_ANGLE, newOffset * ARC_ANGLE, VISIBLE_RANGE + 1, newOffset);
+            } else {
+              cardArcAnimate(cardFlow[i].card, oldOffset * ARC_ANGLE, newOffset * ARC_ANGLE, oldOffset, newOffset);
+            }
+          }
+
+          // Hide cards going out of range after animation
+          if (Math.abs(newOffset) > VISIBLE_RANGE && Math.abs(oldOffset) <= VISIBLE_RANGE) {
+            const card = cardFlow[i].card;
+            setTimeout(() => { card.style.opacity = '0'; }, ARC_DURATION);
+          }
         }
 
-        currentCardIndex++;
+        currentCardIndex = newIndex;
         updateProgressRing(currentCardIndex);
 
-        // After animation, hide cards that are now 2+ away
-        setTimeout(() => {
-          if (prev >= 0) cardFlow[prev].card.style.opacity = '0';
-        }, ARC_DURATION);
-
-        // If we just arrived at the last card (photo), peek the welcome card
+        // If we just arrived at the last card (photo), prepare welcome card data
         if (currentCardIndex === cardFlow.length - 1) {
-          // Populate welcome card
           const preview = document.getElementById('photo-preview');
           if (preview.src) {
             welcomePhotoBg.style.backgroundImage = 'url(' + preview.src + ')';
@@ -1668,8 +1996,17 @@
           const firstName = firstNameInput ? firstNameInput.value.trim() : '';
           welcomeName.textContent = 'Welcome, ' + (firstName || 'Friend') + '!';
 
-          cardSnapTo(welcomeCard, 2 * ARC_ANGLE);
-          cardArcAnimate(welcomeCard, 2 * ARC_ANGLE, ARC_ANGLE);
+          // On mobile, show welcome card peeking; on desktop, don't
+          if (!isDesktop) {
+            cardArcSetup(welcomeCard);
+            welcomeCard.style.transform = 'rotate(' + ((VISIBLE_RANGE + 1) * ARC_ANGLE) + 'deg)';
+            welcomeCard.style.opacity = '0';
+            welcomeCard.style.pointerEvents = 'none';
+            welcomeCard.animate([
+              { transform: 'rotate(' + ((VISIBLE_RANGE + 1) * ARC_ANGLE) + 'deg)', opacity: 0 },
+              { transform: 'rotate(' + (VISIBLE_RANGE * ARC_ANGLE) + 'deg)', opacity: 1 }
+            ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+          }
         }
       }
 
@@ -1677,38 +2014,44 @@
       function transitionBackward() {
         if (currentCardIndex <= 0) return;
 
-        const prevPrev = currentCardIndex - 2;
-        const prev = currentCardIndex - 1;
-        const curr = currentCardIndex;
-        const next = currentCardIndex + 1;
+        const newIndex = currentCardIndex - 1;
 
-        // If we're leaving the last card (photo), hide the welcome card peek
-        if (curr === cardFlow.length - 1) {
-          cardArcAnimate(welcomeCard, ARC_ANGLE, 2 * ARC_ANGLE);
-          setTimeout(() => { welcomeCard.style.opacity = '0'; }, ARC_DURATION);
+        // On mobile, hide the welcome card peek when going back from last card
+        if (!isDesktop && currentCardIndex === cardFlow.length - 1) {
+          cardArcSetup(welcomeCard);
+          welcomeCard.animate([
+            { transform: 'rotate(' + (VISIBLE_RANGE * ARC_ANGLE) + 'deg)', opacity: 1 },
+            { transform: 'rotate(' + ((VISIBLE_RANGE + 1) * ARC_ANGLE) + 'deg)', opacity: 0 }
+          ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
         }
 
-        // Next card (if exists): +ARC_ANGLE → +2*ARC_ANGLE
-        if (next < cardFlow.length) {
-          cardArcAnimate(cardFlow[next].card, ARC_ANGLE, 2 * ARC_ANGLE);
-        }
-        // Current card: 0 → +ARC_ANGLE
-        cardArcAnimate(cardFlow[curr].card, 0, ARC_ANGLE);
-        // Previous card: -ARC_ANGLE → 0
-        cardArcAnimate(cardFlow[prev].card, -ARC_ANGLE, 0);
-        // Prev-prev card (if exists): snap and animate to -ARC_ANGLE
-        if (prevPrev >= 0) {
-          cardSnapTo(cardFlow[prevPrev].card, -2 * ARC_ANGLE);
-          cardArcAnimate(cardFlow[prevPrev].card, -2 * ARC_ANGLE, -ARC_ANGLE);
+        // Animate all cards in visible range
+        for (let i = 0; i < cardFlow.length; i++) {
+          const oldOffset = i - currentCardIndex;
+          const newOffset = i - newIndex;
+
+          if (oldOffset >= -(VISIBLE_RANGE + 1) && oldOffset <= (VISIBLE_RANGE + 1) &&
+              (Math.abs(oldOffset) <= VISIBLE_RANGE || Math.abs(newOffset) <= VISIBLE_RANGE)) {
+
+            if (Math.abs(oldOffset) > VISIBLE_RANGE && Math.abs(newOffset) <= VISIBLE_RANGE) {
+              // Card entering view
+              cardSnapTo(cardFlow[i].card, oldOffset * ARC_ANGLE, oldOffset);
+              cardFlow[i].card.style.opacity = '0';
+              cardArcAnimate(cardFlow[i].card, oldOffset * ARC_ANGLE, newOffset * ARC_ANGLE, VISIBLE_RANGE + 1, newOffset);
+            } else {
+              cardArcAnimate(cardFlow[i].card, oldOffset * ARC_ANGLE, newOffset * ARC_ANGLE, oldOffset, newOffset);
+            }
+          }
+
+          // Hide cards going out of range
+          if (Math.abs(newOffset) > VISIBLE_RANGE && Math.abs(oldOffset) <= VISIBLE_RANGE) {
+            const card = cardFlow[i].card;
+            setTimeout(() => { card.style.opacity = '0'; }, ARC_DURATION);
+          }
         }
 
-        currentCardIndex--;
+        currentCardIndex = newIndex;
         updateProgressRing(currentCardIndex);
-
-        // After animation, hide cards that are now 2+ away
-        setTimeout(() => {
-          if (next < cardFlow.length) cardFlow[next].card.style.opacity = '0';
-        }, ARC_DURATION);
       }
 
       /* ---- Final deck animation ---- */
@@ -1731,18 +2074,66 @@
         setTimeout(() => {
           progressRing.style.transition = 'opacity 0.4s ease';
           progressRing.style.opacity = '0';
+          // Fade out "Already have an account" button same as progress ring
+          if (isDesktop && alreadyAccountBtn) {
+            alreadyAccountBtn.style.transition = 'opacity 0.4s ease';
+            alreadyAccountBtn.style.opacity = '0';
+            alreadyAccountBtn.style.pointerEvents = 'none';
+          }
         }, 500);
         const skipS = document.getElementById('skip-socials');
         const skipI = document.getElementById('skip-interests');
         if (skipS) skipS.classList.remove('visible');
         if (skipI) skipI.classList.remove('visible');
 
-        // 2. Rotate photo card out
-        const curr = currentCardIndex;
-        const prevIdx = currentCardIndex - 1;
-        cardArcAnimate(cardFlow[curr].card, 0, -ARC_ANGLE);
-        if (prevIdx >= 0) {
-          cardArcAnimate(cardFlow[prevIdx].card, -ARC_ANGLE, -2 * ARC_ANGLE);
+        // Ensure welcome card has photo and name set
+        const preview = document.getElementById('photo-preview');
+        if (preview && preview.src) {
+          welcomePhotoBg.style.backgroundImage = 'url(' + preview.src + ')';
+        }
+        const firstNameInput = nameCard.querySelector('input[placeholder="First name"]');
+        const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+        welcomeName.textContent = 'Welcome, ' + (firstName || 'Friend') + '!';
+
+        // 2. Rotate all visible cards fully off screen to the left (50% slower)
+        const EXIT_DURATION = Math.round(ARC_DURATION * 1.5);
+        if (isDesktop) {
+          for (let i = 0; i < cardFlow.length; i++) {
+            const offset = i - currentCardIndex;
+            if (Math.abs(offset) <= VISIBLE_RANGE) {
+              const card = cardFlow[i].card;
+              cardArcSetup(card);
+              const fromAngle = offset * ARC_ANGLE;
+              const targetAngle = (offset - VISIBLE_RANGE - 1) * ARC_ANGLE;
+              const fromStyle = getCardStyle(offset);
+              const toStyle = getCardStyle(-(VISIBLE_RANGE + 1));
+              card.style.opacity = String(Math.max(fromStyle.opacity, toStyle.opacity));
+              card.style.transform = 'rotate(' + fromAngle + 'deg) scale(' + fromStyle.scale + ')';
+              card.animate([
+                { transform: 'rotate(' + fromAngle + 'deg) scale(' + fromStyle.scale + ')', opacity: fromStyle.opacity },
+                { transform: 'rotate(' + targetAngle + 'deg) scale(' + toStyle.scale + ')', opacity: toStyle.opacity }
+              ], { duration: EXIT_DURATION, easing: ARC_EASE, fill: 'forwards' });
+              setTimeout(() => { card.style.opacity = '0'; }, EXIT_DURATION);
+            }
+          }
+        } else {
+          // Mobile: one smooth motion to fully off-screen (50% slower)
+          const MOBILE_EXIT = Math.round(PHASE1_DURATION * 0.95 * 1.5);
+          for (let i = 0; i < cardFlow.length; i++) {
+            const offset = i - currentCardIndex;
+            if (Math.abs(offset) <= VISIBLE_RANGE) {
+              const card = cardFlow[i].card;
+              cardArcSetup(card);
+              const fromAngle = offset * ARC_ANGLE;
+              const targetAngle = -3 * ARC_ANGLE; // far off left
+              card.style.opacity = '1';
+              card.style.transform = 'rotate(' + fromAngle + 'deg)';
+              card.animate([
+                { transform: 'rotate(' + fromAngle + 'deg)', opacity: 1 },
+                { transform: 'rotate(' + targetAngle + 'deg)', opacity: 0 }
+              ], { duration: MOBILE_EXIT, easing: ARC_EASE, fill: 'forwards' });
+            }
+          }
         }
 
         // Collect deck cards
@@ -1756,12 +2147,13 @@
         const winW = window.innerWidth;
         const winH = window.innerHeight;
 
-        // Start position: compute where cards are at ARC_ANGLE on the circular arc
+        // Start position: welcome card enters from ARC_ANGLE (right side)
+        const enterAngle = ARC_ANGLE;
         const arcOx = cardW * 0.5;
         const arcOy = cardH * 0.81 + ARC_RADIUS;
         const arcOrigLeft = (winW - cardW) / 2;
         const arcOrigTop = (winH - cardH) / 2;
-        const radStart = ARC_ANGLE * Math.PI / 180;
+        const radStart = enterAngle * Math.PI / 180;
         const cRelY = cardH / 2 - arcOy;
         const startCenterX = arcOrigLeft + arcOx + (-cRelY * Math.sin(radStart));
         const startCenterY = arcOrigTop + arcOy + (cRelY * Math.cos(radStart));
@@ -1779,7 +2171,12 @@
         allCards.forEach((card, i) => {
           card.getAnimations().forEach(a => a.cancel());
           card.style.zIndex = (i === 0) ? 20 : (10 - i);
-          card.style.opacity = '1';
+          // Fade in the entire deck together over 0.3s
+          card.style.opacity = '0';
+          card.animate([
+            { opacity: 0 },
+            { opacity: 1 }
+          ], { duration: 300, easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)', fill: 'forwards' });
           card.style.willChange = 'transform';
           card.style.position = 'fixed';
           card.style.left = '0px';
@@ -1787,7 +2184,7 @@
           // Phase 1: center origin for move+scale
           card.style.transformOrigin = (cardW / 2) + 'px ' + (cardH / 2) + 'px';
 
-          const fromTransform = 'translate(' + startLeft + 'px, ' + startTop + 'px) rotate(' + ARC_ANGLE + 'deg) scale(1)';
+          const fromTransform = 'translate(' + startLeft + 'px, ' + startTop + 'px) rotate(' + enterAngle + 'deg) scale(1)';
           const midTransform = 'translate(' + endLeft + 'px, ' + endTop + 'px) rotate(0deg) scale(' + SCALE + ')';
 
           const anim = card.animate([
@@ -1840,7 +2237,7 @@
         // After photo card exit, hide onboarding cards
         setTimeout(() => {
           cardFlow.forEach(entry => { entry.card.style.opacity = '0'; });
-        }, ARC_DURATION);
+        }, EXIT_DURATION);
 
         // Show "Return to Series" button after full animation
         // and enable swipe interaction
@@ -2139,6 +2536,7 @@
 
         // Set initial state
         applyRestState();
+
       }
 
       // Return to Series opens iMessage
@@ -2148,48 +2546,68 @@
 
       /* Initial entry: arc in first card, then show next card's corner */
       function cardArcInInitial(card) {
+        // Bring in center card
         cardArcSetup(card);
-        card.style.transform = 'rotate(' + ARC_ANGLE + 'deg)';
-        card.style.opacity = '1';
+        const centerStyle = getCardStyle(0);
+        card.style.transform = 'rotate(' + ARC_ANGLE + 'deg) scale(' + centerStyle.scale + ')';
+        card.style.opacity = '0';
         card.animate([
-          { transform: 'rotate(' + ARC_ANGLE + 'deg)' },
-          { transform: 'rotate(0deg)' }
+          { transform: 'rotate(' + ARC_ANGLE + 'deg) scale(' + centerStyle.scale + ')', opacity: 0 },
+          { transform: 'rotate(0deg) scale(' + centerStyle.scale + ')', opacity: 1 }
         ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
 
-        // Also bring in the next card's corner
-        if (cardFlow.length > 1) {
-          const nextCard = cardFlow[1].card;
-          cardArcSetup(nextCard);
-          nextCard.style.opacity = '1';
-          nextCard.style.transform = 'rotate(' + (2 * ARC_ANGLE) + 'deg)';
-          nextCard.animate([
-            { transform: 'rotate(' + (2 * ARC_ANGLE) + 'deg)' },
-            { transform: 'rotate(' + ARC_ANGLE + 'deg)' }
-          ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+        // Bring in right-side cards
+        for (let offset = 1; offset <= VISIBLE_RANGE; offset++) {
+          if (offset < cardFlow.length) {
+            const sideCard = cardFlow[offset].card;
+            cardArcSetup(sideCard);
+            const sideStyle = getCardStyle(offset);
+            sideCard.style.opacity = '0';
+            sideCard.style.transform = 'rotate(' + ((offset + 1) * ARC_ANGLE) + 'deg) scale(' + sideStyle.scale + ')';
+            sideCard.style.pointerEvents = sideStyle.interactive ? 'auto' : 'none';
+            sideCard.animate([
+              { transform: 'rotate(' + ((offset + 1) * ARC_ANGLE) + 'deg) scale(' + sideStyle.scale + ')', opacity: 0 },
+              { transform: 'rotate(' + (offset * ARC_ANGLE) + 'deg) scale(' + sideStyle.scale + ')', opacity: sideStyle.opacity }
+            ], { duration: ARC_DURATION, easing: ARC_EASE, fill: 'forwards' });
+          }
         }
       }
 
       /* ---- Rive setup ---- */
+      const riveFile = isDesktop ? 'series_desktop.riv' : 'series.riv';
+      const riveFit = isDesktop ? rive.Fit.FitHeight : rive.Fit.FitWidth;
       const r = new rive.Rive({
-        src: 'series.riv',
+        src: riveFile,
         canvas: canvas,
         autoplay: true,
         useOffscreenRenderer: true,
         stateMachines: 'State Machine 1',
-        fit: rive.Fit.FitWidth,
+        fit: riveFit,
         alignment: rive.Alignment.Center,
         onLoad: () => {
           const artboardW = r.artboardWidth;
           const artboardH = r.artboardHeight;
           const dpr = window.devicePixelRatio || 1;
           const winW = window.innerWidth;
-          const scale = winW / artboardW;
-          const scaledH = artboardH * scale;
+          const winH = window.innerHeight;
 
-          canvas.style.width = winW + 'px';
-          canvas.style.height = scaledH + 'px';
-          canvas.width = winW * dpr;
-          canvas.height = scaledH * dpr;
+          let canvasW, canvasH;
+          if (isDesktop) {
+            // Fit to window height, then 120% bigger
+            const scale = (winH / artboardH) * 1.2;
+            canvasW = artboardW * scale;
+            canvasH = artboardH * scale;
+          } else {
+            // Fit to window width
+            const scale = winW / artboardW;
+            canvasW = winW;
+            canvasH = artboardH * scale;
+          }
+
+          canvas.style.width = canvasW + 'px';
+          canvas.style.height = canvasH + 'px';
+          canvas.width = canvasW * dpr;
+          canvas.height = canvasH * dpr;
           r.resizeDrawingSurfaceToCanvas();
 
           const inputs = r.stateMachineInputs('State Machine 1');
@@ -2225,11 +2643,28 @@
         // Show name card and its next button after Handoff state
         setTimeout(() => {
           cardArcInInitial(nameCard);
+          // Desktop: start name-card-next as single centered button
+          if (isDesktop) {
+            nameCardNextIsSingle = true;
+            nameCardNext.style.width = '26vw';
+            nameCardNext.style.left = '50%';
+            nameCardNext.style.right = 'auto';
+            nameCardNext.style.transform = 'translateX(-50%)';
+          }
           buttonShowDim(nameCardNext);
           // Show progress ring at step 0
           updateProgressRing(0);
           progressRing.style.transition = 'opacity 0.4s ease';
           progressRing.style.opacity = '1';
+          // Desktop: set scroll heights after side cards are rendered
+          if (isDesktop) {
+            setTimeout(() => {
+              if (typeof setScrollHeight === 'function') setScrollHeight();
+              if (typeof setSexualityScrollHeight === 'function') setSexualityScrollHeight();
+              if (typeof setReligionScrollHeight === 'function') setReligionScrollHeight();
+              if (typeof renderInterestTags === 'function' && interestsTagsContainer.children.length === 0) renderInterestTags();
+            }, 800);
+          }
         }, 1200);
       });
 
@@ -2239,7 +2674,7 @@
         btn.style.opacity = '0.3';
         btn.animate([
           { bottom: '-60px' },
-          { bottom: '40px' }
+          { bottom: BTN_BOTTOM }
         ], {
           duration: 640,
           easing: 'cubic-bezier(0.5, 0, 0, 1)',
@@ -2282,10 +2717,13 @@
 
       /* ---- Name card next: go forward ---- */
       attachButtonStyle(nameCardNext, () => {
-        // Block if keyboard is still open
-        if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        // Block if keyboard is still open (mobile only)
+        if (!isDesktop && document.activeElement && document.activeElement.tagName === 'INPUT') {
           document.activeElement.blur();
           return;
+        }
+        if (isDesktop && document.activeElement && document.activeElement.tagName === 'INPUT') {
+          document.activeElement.blur();
         }
 
         // Block if current card isn't valid
@@ -2297,13 +2735,29 @@
           return;
         }
 
+        // Desktop: animate name-card-next from single → paired on first advance
+        const wasFirstCard = (currentCardIndex === 0 && isDesktop && nameCardNextIsSingle);
+
         transitionForward();
 
         // Dim next button until new card is valid
         updateNextOpacity();
 
-        // Show go-back button if not on first card
-        if (currentCardIndex > 0 && !buttonState.get(goBackBtn)) {
+        // Desktop: shrink to paired button position
+        if (wasFirstCard) {
+          nameCardNextIsSingle = false;
+          const dur = 400;
+          const ease = 'cubic-bezier(0.5, 0, 0, 1)';
+          nameCardNext.animate([
+            { width: '26vw', left: '50%', transform: 'translateX(-50%)' },
+            { width: '12.5vw', left: 'calc(50% + 0.5vw)', transform: 'none' }
+          ], { duration: dur, easing: ease, fill: 'forwards' });
+          // Show back button after a slight delay for overlap
+          setTimeout(() => {
+            if (currentCardIndex > 0) buttonShow(goBackBtn);
+          }, 100);
+        } else if (currentCardIndex > 0 && !buttonState.get(goBackBtn)) {
+          // Show go-back button if not on first card
           buttonShow(goBackBtn);
         }
 
@@ -2392,7 +2846,7 @@
       }
       // Defer until card is visible to measure
       const scrollObserver = new MutationObserver(() => {
-        if (ethnicityCard.style.opacity === '1') {
+        if (parseFloat(ethnicityCard.style.opacity) > 0) {
           setScrollHeight();
           updateScrollMask();
           scrollObserver.disconnect();
@@ -2447,7 +2901,7 @@
         }
       }
       const sexualityScrollObserver = new MutationObserver(() => {
-        if (sexualityCard.style.opacity === '1') {
+        if (parseFloat(sexualityCard.style.opacity) > 0) {
           setSexualityScrollHeight();
           updateSexualityScrollMask();
           sexualityScrollObserver.disconnect();
@@ -2502,7 +2956,7 @@
         }
       }
       const religionScrollObserver = new MutationObserver(() => {
-        if (religionCard.style.opacity === '1') {
+        if (parseFloat(religionCard.style.opacity) > 0) {
           setReligionScrollHeight();
           updateReligionScrollMask();
           religionScrollObserver.disconnect();
@@ -2619,10 +3073,18 @@
           return;
         }
 
-        // For social platforms, show confirm dialog on tap
+        // For social platforms: desktop opens link directly, mobile shows confirm dialog
         input.addEventListener('click', () => {
           if (!input.readOnly) return; // Already in manual mode
-          showSocialConfirm(field);
+          if (isDesktop) {
+            // Open social link directly in new tab
+            window.open(socialURLs[social], '_blank');
+            // Convert to manual input for when user returns
+            input.readOnly = false;
+            setTimeout(() => input.focus(), 300);
+          } else {
+            showSocialConfirm(field);
+          }
         });
 
         input.addEventListener('input', () => updateNextOpacity());
@@ -2733,7 +3195,7 @@
 
       // Initial render when card becomes visible (deferred)
       const interestsObserver = new MutationObserver(() => {
-        if (interestsCard.style.opacity === '1' && interestsTagsContainer.children.length === 0) {
+        if (parseFloat(interestsCard.style.opacity) > 0 && interestsTagsContainer.children.length === 0) {
           renderInterestTags();
         }
       });
@@ -2848,6 +3310,17 @@
         // Hide go-back if back to first card
         if (currentCardIndex === 0) {
           buttonHide(goBackBtn);
+
+          // Desktop: expand name-card-next back to single centered button
+          if (isDesktop) {
+            nameCardNextIsSingle = true;
+            const dur = 400;
+            const ease = 'cubic-bezier(0.5, 0, 0, 1)';
+            nameCardNext.animate([
+              { width: '12.5vw', left: 'calc(50% + 0.5vw)', transform: 'none' },
+              { width: '26vw', left: '50%', transform: 'translateX(-50%)' }
+            ], { duration: dur, easing: ease, fill: 'forwards' });
+          }
         }
 
         // Update next button opacity for the card we're going back to
