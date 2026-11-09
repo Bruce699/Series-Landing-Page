@@ -13,6 +13,12 @@ node server.js
 
 Server binds to `0.0.0.0:3000`. All files served statically from project root.
 
+### Open Layer preview
+
+Open Layer detects this project as a static site and serves the repository root, including `index.html`, fonts, images, and Rive files. No install step, build step, or custom `.openlayer/preview.json` is required. Do not start `node server.js` alongside the managed preview.
+
+Run `openlayer-preview` to check its status and get the preview URL. Open that URL with `agent-browser open <url>` to verify the page. Asset paths are case-sensitive; preserve the `Social Icons/` and `Final Animation/` directory names.
+
 ---
 
 ## Project Structure
@@ -38,15 +44,15 @@ Server binds to `0.0.0.0:3000`. All files served statically from project root.
 │   ├── Linkedin.svg
 │   └── X.svg
 │
-└── final animation/            # Card deck frames (9 PNGs)
+└── Final Animation/            # Card deck frames (9 PNGs)
     ├── Frame 241.png
-    ├── Frame 243.png
+    ├── Frame 242.png
     ├── Frame 245.png
-    ├── Frame 246.png
-    ├── Frame 247.png
+    ├── Frame 244.png
     ├── Frame 248.png
     ├── Frame 249.png
     ├── Frame 250.png
+    ├── Frame 251.png
     └── Frame 252.png
 ```
 
